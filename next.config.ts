@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+    /* config options here */
+    turbopack: {
+        root: path.join(__dirname, '..'),
+    },
+    experimental: {
+        authInterrupts: true,
+    }
 };
 
 export default nextConfig;

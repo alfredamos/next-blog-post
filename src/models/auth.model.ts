@@ -110,8 +110,13 @@ class AuthModel{
 
         //----> Delete access, session and refresh cookies.
         await this.deleteCookie(CookieParam.accessTokenName);
-        await this.deleteCookie(CookieParam.sessionTokenName);
         await this.deleteCookie(CookieParam.refreshTokenName);
+
+        //----> Nullified session-token
+        const userResponse: UserResponse = {id: "", name: "", email: "", role: Role.User, isLoggedIn: false, isAdmin: false, accessToken: ""}
+        await
+            this.setCookie(CookieParam.sessionTokenName, JSON.stringify(userResponse), CookieParam.sessionTokenPath, CookieParam.sessionTokenExpireIn)
+
 
         //----> Send back response.
         return new ResponseMessageUtil("Logout is successfully!", "success", StatusCodes.OK);
@@ -228,8 +233,9 @@ class AuthModel{
         await this.setCookie(CookieParam.refreshTokenName, refreshToken, CookieParam.refreshTokenPath, CookieParam.refreshTokenExpireIn);
 
         //----> Set the cookie-session.
+        const userResponse: UserResponse = {id: user.id, name: user.name, email: user.email, role: user.role, isLoggedIn: true, isAdmin: user.role === Role.Admin, accessToken}
         await
-            this.setCookie(CookieParam.sessionTokenName, JSON.stringify(user), CookieParam.sessionTokenPath, CookieParam.sessionTokenExpireIn)
+            this.setCookie(CookieParam.sessionTokenName, JSON.stringify(userResponse), CookieParam.sessionTokenPath, CookieParam.sessionTokenExpireIn)
 
 
         //----> Make token object and store it in token db.
@@ -237,7 +243,7 @@ class AuthModel{
         await tokenModel.createToken(tokenObject as Token)
 
         //----> Send back access token.
-        return accessToken;
+        return userResponse;
     }
 
     private setCookie = async (cookieName: string, cookieValue: string, cookiePath: string, maxAge: number) => {

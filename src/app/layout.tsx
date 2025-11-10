@@ -7,8 +7,8 @@ import NavBar from "@/app/NavBar";
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-    title: 'My Next.js App',
-    description: 'A basic Next.js application.',
+    title: 'Blog',
+    description: 'This is an exciting blog app.',
 };
 
 export default function RootLayout({

@@ -4,6 +4,6 @@ export default async function GetAllPosts() {
    const posts = await getAllPosts();
    console.log(posts);
     return(
-        <h1>All posts</h1>
+        <h1 className="px-4 mt-10">All posts</h1>
     )
 }

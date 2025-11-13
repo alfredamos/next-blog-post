@@ -9,7 +9,6 @@ import {ResponseMessageUtil} from "@/utils/responseMessage.util";
 import {fromEditProfileToAuthorUtil} from "@/utils/fromEditProfileToAuthor.util";
 import {toUserDto} from "@/dto/toUser.dto";
 import {CookieParam} from "@/utils/cookieParam.util";
-import {resourceIsNullOrUndefined} from "@/utils/checkForNullResource.util";
 import {tokenModel} from "@/models/token.model";
 import {validateUserToken} from "@/utils/validateToken.util";
 import {ChangeUserPassword, EditUserProfile, LoginUser, SignupUser} from "@/validations/auth.validation";
@@ -22,7 +21,7 @@ class AuthModel{
 
         //----> Check for password match.
         if (!this.checkForPasswordMatch(confirmPassword, newPassword)){
-            return new CustomError("Bad request", "Passwords don't match!", StatusCodes.BAD_REQUEST);
+            throw new CustomError("Bad request", "Passwords don't match!", StatusCodes.BAD_REQUEST);
         }
 
         //----> Check for existence of user.
@@ -30,7 +29,7 @@ class AuthModel{
 
         //----> Check for valid password.
         if (! await this.checkForValidPassword(password, user.password)){
-            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            throw new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Hash the new password.
@@ -53,7 +52,7 @@ class AuthModel{
 
         //----> Check for valid password.
         if (! await this.checkForValidPassword(password, user.password)){
-            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            throw new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Update the user.
@@ -75,6 +74,7 @@ class AuthModel{
         return toUserDto(await this.getUserByEmail(email));
     }
 
+
     async loginUser(req: LoginUser){
         //----> Destructure req.
         const {email, password} = req;
@@ -84,7 +84,7 @@ class AuthModel{
 
         //----> Check for valid password.
         if (! await this.checkForValidPassword(password, user.password)){
-            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            throw new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Generate access and refresh tokens and store them in cookies and send back access token.
@@ -98,15 +98,17 @@ class AuthModel{
 
         //----> Check for null access token.
         if (!accessToken) {
-            return new CustomError("Null Token", "You have already logged out!", StatusCodes.UNAUTHORIZED);
+            throw new CustomError("Null Token", "You have already logged out!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Get the valid token object.
         const tokenObject = await tokenModel.findTokenByAccessToken(accessToken);
-        if (!tokenObject) return resourceIsNullOrUndefined("tokenObject")
+        if (!tokenObject){
+            throw new CustomError("Token is empty", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+        }
 
         //----> Revoke all valid tokens.
-        await tokenModel.revokedTokensByUserId(tokenObject?.userId);
+        await tokenModel.revokedTokensByUserId(tokenObject.userId);
 
         //----> Delete access, session and refresh cookies.
         await this.deleteCookie(CookieParam.accessTokenName);
@@ -125,7 +127,7 @@ class AuthModel{
     refreshUserToken = async (refreshToken: string) => {
         //----> Check for null refresh token.
         if (!refreshToken) {
-            return new ResponseMessageUtil("Your refresh token has expired", "success", StatusCodes.UNAUTHORIZED);
+            throw new CustomError("No refreshToken", "Your refresh token has expired", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Validate refresh token.
@@ -133,7 +135,7 @@ class AuthModel{
 
         //----> Check for null userToken
         if (!userToken) {
-            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            throw new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Generate access and refresh tokens and store them in cookies and send back access token.
@@ -147,13 +149,13 @@ class AuthModel{
 
         //----> Check for password match.
         if (!this.checkForPasswordMatch(password, confirmPassword)){
-            return new CustomError("UnAuthorized", "Passwords don't match!", StatusCodes.BAD_REQUEST);
+            throw new CustomError("UnAuthorized", "Passwords don't match!", StatusCodes.BAD_REQUEST);
         }
 
         //----> Check for existence of user.
         const user = await prisma.user.findUnique({where: {email}})
         if (user){
-            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            throw new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Hash password.

@@ -1,5 +1,4 @@
 import {StatusCodes} from "http-status-codes";
-import {resourceIsNullOrUndefined} from "@/utils/checkForNullResource.util";
 import {ownerCheckOrAdmin} from "@/utils/ownerCheckOrAdmin.util";
 import {CustomError} from "@/utils/customError.util";
 import prisma from "@/db/prisma.db";
@@ -11,11 +10,13 @@ class UserModel {
    async deleteUserById(id: string) {
        //----> Fetch the user.
        const user = await this.getOneUser(id);
-       if (!user) return resourceIsNullOrUndefined("user");
+       if (!user) {
+           throw new CustomError("Not found", "User is not foud in db!", StatusCodes.NOT_FOUND);
+       }
 
        //----> Check for ownership or admin.
        if (!await ownerCheckOrAdmin(id)){
-           return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+           throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
        }
 
        //----> Delete the user with the given id.
@@ -29,12 +30,14 @@ class UserModel {
    async getUserById(id: string) {
        //----> Check for ownership or admin.
        if (!await ownerCheckOrAdmin(id)){
-           return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+           throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
        }
 
        //----> Fetch the user.
        const user = await this.getOneUser(id);
-       if (!user) return resourceIsNullOrUndefined("user");
+       if (!user) {
+           throw new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
+       }
        return  toUserDto(user);
 
    }
@@ -42,7 +45,7 @@ class UserModel {
    async getAllUsers() {
        //----> Must be an admin.
        if (!await adminUserUtil()){
-           return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+           throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
        }
 
        //----> Fetch all users.

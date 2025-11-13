@@ -3,21 +3,58 @@
 import {authModel} from "@/models/auth.model";
 import {ChangeUserPassword, EditUserProfile, LoginUser, SignupUser} from "@/validations/auth.validation";
 import {redirect} from "next/navigation";
-import {revalidatePath} from "next/cache";
+import {getLoggedInUserInfo} from "@/lib/getLoggedInUser";
+import {CustomError} from "@/utils/customError.util";
 
-export async function changeUserPassword(req: ChangeUserPassword){
+export async function changeUserPassword(formData: FormData) {
+    //----> Extract the parameters from formData.
+    const cupReq = Object.fromEntries(formData.entries()) as ChangeUserPassword;
+    const req : ChangeUserPassword = {
+        email: cupReq.email,
+        password: cupReq.password,
+        confirmPassword: cupReq.confirmPassword,
+        newPassword: cupReq.password,
+    }
     //----> Change the user password in the db.
-    return await authModel.changeUserPassword(req);
+    await authModel.changeUserPassword(req);
+
+    return redirect("/");
 }
 
-export async function editUserPassword(req: EditUserProfile){
-    //----> Edit user profile in the db.
-    return await authModel.editUserProfile(req);
+export async function editUserProfile(formData: FormData){
+    //----> Extract form values.
+    const editProfileOfUser = Object.fromEntries(formData.entries());
+
+    console.log("editProfileOfUser, formDataValue", editProfileOfUser);
+
+    const req: EditUserProfile = {
+        email: editProfileOfUser.email as string,
+        password: editProfileOfUser.password as string,
+        name: editProfileOfUser.name as string,
+        phone: editProfileOfUser.phone as string,
+        address: editProfileOfUser.address as string,
+        image: editProfileOfUser.image as string,
+        dateOfBirth: editProfileOfUser.dateOfBirth as string,
+        gender: editProfileOfUser.gender as  'Male' | 'Female',
+    }
+    console.log("In editUserProfile, req : ", req);
+
+    //----> Refresh user token.
+    const response = await authModel.editUserProfile(req);
+
+    if (!response?.status) {
+        redirect("/login");
+    }
+
+    console.log("In editUserProfile, req : ", response);
+    return redirect("/");
 }
 
-export async function getCurrentUser(email: string){
+
+export async function getCurrentUser(){
+    const userResponse = await getLoggedInUserInfo()
     //----> Get current user from db.
-    const authResponse = await authModel.getCurrentUser(email);
+    const authResponse = await authModel.getCurrentUser(userResponse.email);
 
     //----> Send back response.
     return authResponse;
@@ -35,8 +72,8 @@ export async function loginUser(formData: FormData){
 
      console.log("In login action, userRes : ",userRes);
 
-    //----> Go to post.
-    redirect("/")
+     //----> Send back user response.
+     return userRes;
 }
 
 export async function logoutUser(){
@@ -65,7 +102,7 @@ export async function signupUser(formData: FormData){
         address: signupReq.address as string,
         image: signupReq.image as string,
         dateOfBirth: signupReq.dateOfBirth as string,
-        gender: signupReq.genderas as  'Male' | 'Female',
+        gender: signupReq.gender as  'Male' | 'Female',
     }
     console.log("In signupUser, req : ", req);
 

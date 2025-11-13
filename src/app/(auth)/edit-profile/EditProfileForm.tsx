@@ -1,14 +1,32 @@
 import Form from "next/form";
-import {signupUser as signupAction} from "@/app/actions/auth.action";
 import CancelButton from "@/utils/CancelButton";
+import {Author} from "@prisma/client";
+import {editUserProfile} from "@/app/actions/auth.action";
+import {getLoggedInUserInfo} from "@/lib/getLoggedInUser";
+import {redirect} from "next/navigation";
 
-export default function SignupForm() {
+type Props = {
+    author: Author;
+}
+
+export default async function EditProfileForm({ author }: Props) {
+
+    const formattedDate = (fDate: Date) => {
+        // Extract year, month, and day
+        const year = fDate.getFullYear();
+        const month = (fDate.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+        const day = fDate.getDate().toString().padStart(2, '0');
+
+        // Format the date as "YYYY-MM-DD"
+        return `${year}-${month}-${day}`;
+    }
+
     return (
         <Form
-            action={signupAction}
+            action={editUserProfile}
             className="bg-white text-slate-800 max-w-lg flex flex-col justify-center items-center mx-auto rounded-xl shadow-2xl py-10 mt-10"
         >
-            <h4 className="font-bold text-slate-800 text-2xl mb-6">Signup Form</h4>
+            <h4 className="font-bold text-slate-800 text-2xl mb-6">Edit User Profile Form</h4>
             <div className="mb-6 w-full px-10">
                 <label htmlFor="name" className="flex flex-start w-full font-medium">
                     Name
@@ -17,6 +35,7 @@ export default function SignupForm() {
                     id="name"
                     name="name"
                     type="text"
+                    defaultValue={author?.name}
                     className="border-solid border-2 border-gray-300 focus:border-indigo-600 focus:outline-none bg-slate-200 p-2 rounded-lg text-black w-full"
                 />
             </div>
@@ -31,6 +50,7 @@ export default function SignupForm() {
                     id="email"
                     name="email"
                     type="email"
+                    defaultValue={author?.email}
                     className="border-solid border-2 border-gray-300 focus:border-indigo-600 focus:outline-none bg-slate-200 w-full p-2 rounded-lg text-black"
                 />
             </div>
@@ -45,6 +65,7 @@ export default function SignupForm() {
                     id="phone"
                     name="phone"
                     type="tel"
+                    defaultValue={author?.phone}
                     className="border-solid border-2 border-gray-300 focus:border-indigo-600 focus:outline-none bg-slate-200 w-full p-2 rounded-lg text-black"
                 />
             </div>
@@ -59,6 +80,7 @@ export default function SignupForm() {
                     id="image"
                     name="image"
                     type="text"
+                    defaultValue={author?.image}
                     className="border-solid border-2 border-gray-300 focus:border-indigo-600 focus:outline-none bg-slate-200 w-full p-2 rounded-lg text-black"
                 />
             </div>
@@ -73,6 +95,7 @@ export default function SignupForm() {
                     id="dateOfBirth"
                     name="dateOfBirth"
                     type="date"
+                    defaultValue={formattedDate(author.dateOfBirth)}
                     className="border-solid border-2 border-gray-300 focus:border-indigo-600 focus:outline-none bg-slate-200 w-full p-2 rounded-lg text-black"
                 />
             </div>
@@ -90,20 +113,7 @@ export default function SignupForm() {
                     className="border-solid border-2 border-gray-300 focus:border-indigo-600 focus:outline-none bg-slate-200 w-full p-2 rounded-lg text-black"
                 />
             </div>
-            <div className="mb-5 w-full px-10">
-                <label
-                    htmlFor="confirmPassword"
-                    className="flex flex-start w-full font-medium"
-                >
-                    Confirm Password
-                </label>
-                <input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    className="border-solid border-2 border-gray-300 focus:border-indigo-600 focus:outline-none bg-slate-200 w-full p-2 rounded-lg text-black"
-                />
-            </div>
+
             <div className="mb-6 w-full px-10">
                 <label htmlFor="gender" className="flex flex-start w-full font-medium">
                     Gender
@@ -111,6 +121,7 @@ export default function SignupForm() {
                 <select
                     id="gender"
                     name="gender"
+                    defaultValue={author?.gender}
                     className="border-solid border-2 border-gray-300 focus:border-indigo-600 focus:outline-none bg-slate-200 w-full p-2 rounded-lg text-black"
                 >
                     <option>Select Gender</option>
@@ -128,6 +139,7 @@ export default function SignupForm() {
                 <textarea
                     id="address"
                     name="address"
+                    defaultValue={author?.address}
                     className="border-solid border-2 border-gray-300 focus:border-indigo-600 focus:outline-none bg-slate-200 w-full p-2 rounded-lg text-black"
                 />
             </div>

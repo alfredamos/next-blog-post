@@ -1,5 +1,4 @@
-// app/error.tsx
-'use client'; // This is a client component
+'use client';
 
 import { useEffect, useState } from 'react';
 
@@ -8,7 +7,7 @@ interface ErrorProps {
     reset: () => void;
 }
 
-export default function Error({ error, reset }: ErrorProps) {
+export default function ErrorPage({ error, reset }: ErrorProps) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {

@@ -1,5 +1,23 @@
-export default function EditProfilePage() {
+import EditProfileForm from "@/app/(auth)/edit-profile/EditProfileForm";
+import {getLoggedInUserInfo} from "@/lib/getLoggedInUser";
+import {unauthorized} from "next/navigation";
+import {getAuthorEmail, getAuthorId} from "@/app/actions/author.action";
+import {Author} from "@prisma/client";
+
+export default async function EditProfilePage() {
+    //----> Get user session.
+    const userResponse = await getLoggedInUserInfo();
+
+    console.log("In edit user profile, userResponse : ", userResponse);
+
+    //----> Check for null session.
+    if (!userResponse) unauthorized();
+
+    //----> Get the author associated with this user.
+    const author = await getAuthorEmail(userResponse.email) as Author;
+
+    console.log("In edit user profile, author : ", author);
     return (
-        <h1 className="px-4 mt-10">Edit Profile</h1>
+        <EditProfileForm author={author}/>
     );
 }

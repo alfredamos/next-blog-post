@@ -1,7 +1,6 @@
 import {StatusCodes} from "http-status-codes";
 import {getSessionCookie} from "@/lib/getSessionCookie";
 import {CustomError} from "@/utils/customError.util";
-import {TokenJwt} from "@/utils/tokenJwt.util";
 
 export async function getLoggedInUserInfo(){
     //----> Get session token.
@@ -12,6 +11,6 @@ export async function getLoggedInUserInfo(){
     }
 
     //----> Parse user info.
-    return JSON.parse(session) as TokenJwt;
+    return JSON.parse(session) as UserResponse;
 
 }

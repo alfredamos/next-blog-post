@@ -1,43 +1,75 @@
+"use client"
+
 import Form from "next/form";
-import {loginUser} from "@/app/actions/auth.action";
-import {LoginUser} from "@/validations/auth.validation";
+import {loginUser as loginAction} from "@/app/actions/auth.action";
+import {useRouter} from "next/navigation";
+import {useAuthContext} from "@/hooks/useAuthContext";
+import CancelButton from "@/utils/CancelButton";
+import {CustomError} from "@/utils/customError.util";
+import {useLocalStorage} from "@/hooks/useLocalStorage";
+import {LocalStorageParam} from "@/utils/LocalStorageParam";
 
-type Props = {
-    login: LoginUser;
-}
+export default function LoginForm() {
+    const router = useRouter();
+    const {setUserResponse} = useAuthContext()
+    const {setLocalStorage} = useLocalStorage<UserResponse>()
 
-export default function LoginForm({ login }: Props) {
+    const loginSubmitHandler = async (formData: FormData) => {
+        try {
+            const response = await loginAction(formData); //----> Login.
+            console.log("In login : ", {response})
+            setUserResponse(response as UserResponse);
+            setLocalStorage(LocalStorageParam.userResp, response)
+
+        } catch (error) {
+            console.error(error); //----> Show toast for successful login.
+        }finally{
+            router.push("/");
+        }
+    }
     return (
-        <div className="bg-white shadow-xlg w-1/2 mx-auto mt-10 px-4 border border-gray-900 rounded-lg">
-        <Form action={loginUser}>
-            <h2 className="px-6 mb-3">Login Form</h2>
-            <div className="mb-3 px-6">
-                <label htmlFor="email">Email</label>
+        <Form
+            action={loginSubmitHandler}
+            className="bg-white text-slate-800 max-w-lg flex flex-col justify-center items-center mx-auto rounded-xl shadow-2xl py-10 mt-10"
+        >
+            <h4 className="font-bold text-slate-800 text-2xl mb-6">Login Form</h4>
+            <div className="mb-6 w-full px-10">
+                <label
+                    htmlFor="email"
+                    className="flex flex-start w-full font-medium tracking-wide"
+                >
+                    Email
+                </label>
                 <input
-                type="email"
-                name="email"
-                id="email"
-                placeholder="Your email address"
-                defaultValue={login?.email}
-                className="border border-slate-100 rounded-sm px-1"
+                    id="email"
+                    name="email"
+                    type="email"
+                    className="border-solid border-2 border-gray-300 focus:border-indigo-600 focus:outline-none bg-slate-200 w-full p-2 rounded-lg text-black"
                 />
             </div>
-            <div className="mb-3 px-6">
-                <label htmlFor="password">Password</label>
+            <div className="mb-6 w-full px-10">
+                <label
+                    htmlFor="password"
+                    className="flex flex-start w-full font-medium"
+                >
+                    Password
+                </label>
                 <input
-                type="password"
-                placeholder="Enter your Password"
-                name="password"
-                id="password"
-                defaultValue={login?.password}
-                className="border border-slate-100 rounded-sm px-1 text-muted px-1"
+                    id="password"
+                    name="password"
+                    type="password"
+                    className="border-solid border-2 border-gray-300 focus:border-indigo-600 focus:outline-none bg-slate-200 w-full p-2 rounded-lg text-black"
                 />
             </div>
-            <div className="px-6 mb-3 flex justify-between items-center">
-                <button type="submit" className="border border-slate-900 rounded-sm px-2 py-1 hover:bg-slate-900 hover:text-slate-100">Login</button>
-                <button type="button" className="border border-slate-900 rounded-sm px-2 py-1 hover:bg-yellow-900 hover:text-yellow-100">Back</button>
+            <div className="flex justify-between w-full px-10 mb-6">
+                <button
+                    type="submit"
+                    className="py-2 px-4 border-2 border-indigo-900 hover:bg-indigo-900 hover:text-white text-indigo-900 font-bold text-lg rounded-lg mr-4 w-full"
+                >
+                    Submit
+                </button>
+                <CancelButton className="w-full" />
             </div>
         </Form>
-        </div>
-    )
+    );
 }

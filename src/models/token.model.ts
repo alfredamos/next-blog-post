@@ -6,7 +6,6 @@ import {ownerCheckOrAdmin} from "@/utils/ownerCheckOrAdmin.util";
 import {CustomError} from "@/utils/customError.util";
 import {QueryConditionUtil} from "@/utils/queryCondition.util";
 import {adminUserUtil} from "@/utils/adminUser.util";
-import {resourceIsNullOrUndefined} from "@/utils/checkForNullResource.util";
 
 class TokenModel{
     async createToken(token: Token){
@@ -22,7 +21,7 @@ class TokenModel{
     async deleteInvalidTokensByUserId(userId: string){
         //----> Check for ownership or admin.
         if (!await ownerCheckOrAdmin(userId)){
-            return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+            throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
         }
 
         //----> Retrieve invalid tokens by user id.
@@ -39,7 +38,7 @@ class TokenModel{
     async deleteAllInvalidTokens(){
         //----> Must be an admin.
         if (!await adminUserUtil()){
-            return new CustomError("Forbidden", "You don't permission to view or perform this action!", StatusCodes.FORBIDDEN)
+            throw new CustomError("Forbidden", "You don't permission to view or perform this action!", StatusCodes.FORBIDDEN)
         }
 
         //----> Retrieve all invalid tokens.
@@ -55,7 +54,9 @@ class TokenModel{
     async findTokenByAccessToken(accessToken: string){
         //----> Fetch the token object with the given access-token.
         const token = await this.getOneToken(accessToken);
-        if (!token) resourceIsNullOrUndefined("token");
+        if (!token) {
+            throw new CustomError("Not found", "Token is not foud in db!", StatusCodes.NOT_FOUND);
+        }
 
         //----> Send back response.
         return token;
@@ -99,7 +100,7 @@ class TokenModel{
 
         //----> Check for empty counts.
         if (!batchDeletedTokens.count) {
-            return new CustomError("Not found", "No invalid tokens to delete!", StatusCodes.NOT_FOUND);
+            throw new CustomError("Not found", "No invalid tokens to delete!", StatusCodes.NOT_FOUND);
         }
 
         //----> Send back response.

@@ -1,6 +1,5 @@
 import {StatusCodes} from "http-status-codes";
 import {Author} from "@prisma/client";
-import {resourceIsNullOrUndefined} from "@/utils/checkForNullResource.util";
 import {ownerCheckOrAdmin} from "@/utils/ownerCheckOrAdmin.util";
 import {CustomError} from "@/utils/customError.util";
 import prisma from "@/db/prisma.db";
@@ -11,11 +10,13 @@ class AuthorModel{
     async deleteAuthorById(id: string) {
        //----> Fetch the author with the given id.
        const author = await this.getOneAuthor(id);
-       if (!author) return resourceIsNullOrUndefined("author")
+       if (!author) {
+           throw new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
+       }
 
         //----> Check for ownership or admin.
         if (!await ownerCheckOrAdmin(author.userId)){
-            return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+            throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
         }
 
        //----> Delete the user and the associated author.
@@ -28,11 +29,13 @@ class AuthorModel{
     async editAuthorById(id: string, authorToEdit: Author) {
        //----> Fetch the author with the given id.
        const author = await this.getOneAuthor(id);
-        if (!author) return resourceIsNullOrUndefined("author");
+        if (!author) {
+            throw new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
+        }
 
        //----> Check for ownership or admin.
         if (!await ownerCheckOrAdmin(author.userId)){
-            return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+            throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
         }
 
        //----> Calculate age.
@@ -44,7 +47,9 @@ class AuthorModel{
 
        //----> Edit associated user.
        const user = await this.getOneUser(author.userId);
-       if (!user) return resourceIsNullOrUndefined("user");
+       if (!user) {
+           throw new CustomError("Not found", "User is not foud in db!", StatusCodes.NOT_FOUND);
+       }
        user.name = editedAuthor.name;
        user.image = editedAuthor.image;
        await prisma.user.update({where: {id: user.id}, data: {...user}});
@@ -56,11 +61,29 @@ class AuthorModel{
     async getAuthorById(id: string) {
         //----> Fetch the author with the given id.
         const author = await this.getOneAuthor(id);
-        if (!author) return resourceIsNullOrUndefined("author")
+        if (!author) {
+            throw new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
+        }
 
         //----> Check for ownership or admin.
         if (!await ownerCheckOrAdmin(author.userId)){
-            return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+            throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+        }
+
+        //----> Send back response.
+        return author;
+    }
+
+    async getAuthorByEmail(email: string) {
+        //----> Fetch the author with the given email.
+        const author = await prisma.author.findUnique({where: { email }});
+        if (!author) {
+            throw new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
+        }
+
+        //----> Check for ownership or admin.
+        if (!await ownerCheckOrAdmin(author.userId)){
+            throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
         }
 
         //----> Send back response.
@@ -70,7 +93,7 @@ class AuthorModel{
     async getAllAuthors() {
         //----> Must be an admin.
         if (!await adminUserUtil()){
-            return new CustomError("Forbidden", "You don't have permission to view or perform this action!", StatusCodes.FORBIDDEN)
+            throw new CustomError("Forbidden", "You don't have permission to view or perform this action!", StatusCodes.FORBIDDEN)
         }
 
         //----> Fetch all authors.

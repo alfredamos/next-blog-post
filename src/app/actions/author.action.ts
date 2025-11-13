@@ -13,6 +13,11 @@ export async function editAuthorId(id: string, authorToEdit: Author){
     return await authorModel.editAuthorById(id, authorToEdit);
 }
 
+export async function getAuthorEmail(email: string){
+    //----> Fetch the author with given email.
+    return await authorModel.getAuthorByEmail(email);
+}
+
 export async function getAuthorId(id: string){
     //----> Fetch the author with given id.
     return await authorModel.getAuthorById(id);

@@ -3,6 +3,7 @@ import {isPublicRoute} from "@/utils/publicRoute.util";
 import {getAccessCookie} from "@/lib/getAccesscookie.lib";
 import {validateUserToken} from "@/utils/validateToken.util";
 import {resourceIsNullOrUndefined} from "@/utils/checkForNullResource.util";
+import {redirect} from "next/navigation";
 
 export async function cookieAuthenticationMiddleware(req: NextRequest){
     //----> Public routes are not included in must authenticate.

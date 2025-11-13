@@ -5,7 +5,6 @@ import {loginUser as loginAction} from "@/app/actions/auth.action";
 import {useRouter} from "next/navigation";
 import {useAuthContext} from "@/hooks/useAuthContext";
 import CancelButton from "@/utils/CancelButton";
-import {CustomError} from "@/utils/customError.util";
 import {useLocalStorage} from "@/hooks/useLocalStorage";
 import {LocalStorageParam} from "@/utils/LocalStorageParam";
 

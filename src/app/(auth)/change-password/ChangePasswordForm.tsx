@@ -1,8 +1,6 @@
 import {changeUserPassword} from "@/app/actions/auth.action";
 import CancelButton from "@/utils/CancelButton";
 import Form from "next/form";
-import {getLoggedInUserInfo} from "@/lib/getLoggedInUser";
-import {redirect} from "next/navigation";
 
 type email = {
     email: string;

@@ -2,7 +2,6 @@ import './globals.css';
 import { Inter } from 'next/font/google';
 import React from "react";
 import {Metadata} from "next";
-import NavBar from "@/app/NavBar";
 import AuthContext from "@/app/authContext";
 import NavigationBar from "@/app/NavigationBar";
 
@@ -19,14 +18,16 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <AuthContext>
-            <html lang="en">
+
+        <html lang="en">
             {/*<body className={inter.className}>*/}
+            <AuthContext>
                 <body className="bg-white min-h-screen text-black dark:text-white">
                     <NavigationBar/>
                     {children}
                 </body>
-            </html>
-        </AuthContext>
+            </AuthContext>
+        </html>
+
     );
 }

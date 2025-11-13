@@ -6,11 +6,10 @@ import {redirect} from "next/navigation";
 import {CustomError} from "@/utils/customError.util";
 import {Role} from "@prisma/client";
 
-export function validateUserToken(token: string){
+export function validateUserToken(token: string): UserResponse{
     //----> Check for empty token.
     if(!token) {
         return USER_NOT_LOGIN;
-        //throw new CustomError("Unauthorized", "Invalid token", StatusCodes.UNAUTHORIZED);
     }
 
     //----> Verify the jwt-token
@@ -18,8 +17,7 @@ export function validateUserToken(token: string){
         const tokenJwt = jwt?.verify(token, process.env.JWT_TOKEN_KEY!) as TokenJwt;
         return getUserCredential(tokenJwt, token);
     }catch(_error: unknown) {
-        return USER_NOT_LOGIN;
-        //throw new CustomError("Unauthorized", "Invalid credentials", StatusCodes.UNAUTHORIZED);
+        return  {...USER_NOT_LOGIN, accessToken: token};
     }
 
 }

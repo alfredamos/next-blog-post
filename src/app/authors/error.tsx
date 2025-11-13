@@ -1,5 +1,4 @@
-// app/error.tsx
-'use client'; // This is a client component
+'use client';
 
 import { useEffect, useState } from 'react';
 

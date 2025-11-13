@@ -2,8 +2,6 @@ import Form from "next/form";
 import CancelButton from "@/utils/CancelButton";
 import {Author} from "@prisma/client";
 import {editUserProfile} from "@/app/actions/auth.action";
-import {getLoggedInUserInfo} from "@/lib/getLoggedInUser";
-import {redirect} from "next/navigation";
 
 type Props = {
     author: Author;

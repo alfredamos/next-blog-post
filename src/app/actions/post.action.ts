@@ -11,36 +11,76 @@ import {CustomError} from "@/utils/customError.util";
 export async function createPost(req: Post){
     //----> Check validation error.
     const result = validateWithZodSchema(postSchema, req)
-    if (result instanceof NextResponse) {
-        return result;
+    if (result instanceof CustomError) {
+        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
     }
     //----> Insert new post into db.
-    return await postModel.createPost(req);
+    const response = await postModel.createPost(req);
+
+    if (response instanceof CustomError) {
+        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR})
+    }
+
+    //----> Send back response.
+    return NextResponse.json(response, {status: StatusCodes.OK});
+
 }
 
 export async function deletePostById(id:string){
     //----> Delete the post with the given id.
-    return await postModel.deletePostById(id);
+    const response = await postModel.deletePostById(id);
+
+    if (response instanceof CustomError) {
+        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR})
+    }
+
+    //----> Send back response.
+    return NextResponse.json(response, {status: StatusCodes.OK});
+
 }
 
 export async function deletePostsByAuthorId(authorId:string){
     //----> Delete all the posts with the given authorId.
-    return await postModel.deletePostByAuthorId(authorId);
+    const response = await postModel.deletePostByAuthorId(authorId);
+
+    if (response instanceof CustomError) {
+        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR})
+    }
+
+    //----> Send back response.
+    return NextResponse.json(response, {status: StatusCodes.OK});
+
 }
 
 export async function editPostById(id:string, req:Post){
     //----> Check validation error.
     const result = validateWithZodSchema(postSchema, req)
-    if (result instanceof NextResponse) {
-        return result;
+    if (result instanceof CustomError) {
+        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
     }
     //----> Edit the post with the given id.
-    return await postModel.editPostById(id, req);
+    const response = await postModel.editPostById(id, req);
+
+    if (response instanceof CustomError) {
+        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR})
+    }
+
+    //----> Send back response.
+    return NextResponse.json(response, {status: StatusCodes.OK});
+
 }
 
 export async function getPostById(id:string){
     //----> Fetch the post with the given id.
-    return await postModel.getPostById(id);
+    const response = await postModel.getPostById(id);
+
+    if (response instanceof CustomError) {
+        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR})
+    }
+
+    //----> Send back response.
+    return NextResponse.json(response, {status: StatusCodes.OK});
+
 }
 
 export async function getAllPosts(){
@@ -57,7 +97,7 @@ export async function getPostsByAuthorId(authorId:string){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
     }
 
     //----> Send back response.

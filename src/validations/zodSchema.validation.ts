@@ -1,7 +1,7 @@
 import { ZodType as ZodSchema } from "zod";
-import {NextResponse} from "next/server";
 import {StatusCodes} from "http-status-codes";
-import { fromZodError } from "zod-validation-error";
+import {CustomError} from "@/utils/customError.util";
+import {extractZodErrorMessages} from "@/validations/extractZodErrorMessages.util";
 
 export function validateWithZodSchema<T>(
     schema: ZodSchema<T>,
@@ -11,9 +11,9 @@ export function validateWithZodSchema<T>(
 
     //----> Check for error
     if (!result.success) {
-        const validationError = fromZodError(result.error);
-        return NextResponse.json(validationError.message, {status: StatusCodes.BAD_REQUEST})
+        const errors = extractZodErrorMessages(result.error);
+        console.log("In zod-validate, errors : ", errors);
+        return new CustomError("Validation Error", errors.join(", "), StatusCodes.BAD_REQUEST);
     }
-    //NextResponse.next()
     return result;
 }

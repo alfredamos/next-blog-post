@@ -15,7 +15,7 @@ export async function deleteAuthorId(id: string){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
     }
 
     //----> Redirect to all authors
@@ -27,8 +27,8 @@ export async function editAuthorId(id: string, req: Author){
     const result = validateWithZodSchema(authorSchema, req)
 
     //----> Check for validation errors
-    if (result instanceof NextResponse) {
-        return NextResponse.json(result);
+    if (result instanceof CustomError) {
+        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
     }
 
     //----> Edit the author with the given id.
@@ -36,7 +36,7 @@ export async function editAuthorId(id: string, req: Author){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR});
     }
 
     //----> Redirect to all authors.
@@ -49,7 +49,7 @@ export async function getAuthorEmail(email: string){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR});
     }
 
     //----> Send back response.
@@ -62,7 +62,7 @@ export async function getAuthorId(id: string){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR});
     }
 
     //----> Send back response.
@@ -76,7 +76,7 @@ export async function getAllAuthors(){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR});
     }
 
     //----> Send back response.

@@ -11,8 +11,8 @@ export async function POST(request: NextRequest) {
 
     //----> Check validation error.
     const result = validateWithZodSchema(loginUserSchema, loginUser)
-    if (result instanceof NextResponse) {
-        return NextResponse.json(result);
+    if (result instanceof CustomError) {
+        return NextResponse.json(result, {status: StatusCodes.UNAUTHORIZED});
     }
 
     //----> LoginUser in the db.

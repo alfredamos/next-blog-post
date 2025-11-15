@@ -11,8 +11,8 @@ export async function PATCH(request: NextRequest) {
 
     //----> Check validation error.
     const result = validateWithZodSchema(changeUserPasswordSchema, changeUserPassword)
-    if (result instanceof NextResponse) {
-        return NextResponse.json(result);
+    if (result instanceof CustomError) {
+        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
     }
 
     //----> Change password in the db.
@@ -20,7 +20,7 @@ export async function PATCH(request: NextRequest) {
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
     }
 
     //----> Send back response.

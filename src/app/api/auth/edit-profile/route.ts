@@ -11,15 +11,15 @@ export async function PATCH(request: NextRequest) {
 
     //----> Check validation error.
     const result = validateWithZodSchema(editProfileUserSchema, editUserProfile)
-    if (result instanceof NextResponse) {
-        return NextResponse.json(result);
+    if (result instanceof CustomError) {
+        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
     }
 
     //----> Edit Profile user in the db.
     const response  = await authModel.editUserProfile(result.data);
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
     }
 
     //----> Send back response.

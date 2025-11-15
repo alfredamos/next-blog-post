@@ -188,7 +188,7 @@ class AuthModel{
         //----> Check for existence of user.
         const user = await prisma.user.findUnique({where: {email}})
         if (user){
-            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            return new CustomError("UnAuthorized", "User already exist!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Hash password.

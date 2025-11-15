@@ -13,7 +13,7 @@ export async function deleteUserById(id:string){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR});
     }
 
     //----> Send back response.
@@ -27,7 +27,7 @@ export async function getUserById(id:string){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR});
     }
 
     //----> Send back response.
@@ -40,7 +40,7 @@ export async function getAllUsers(){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR});
     }
 
     //----> Send back response.

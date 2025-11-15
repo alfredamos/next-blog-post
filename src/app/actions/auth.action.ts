@@ -15,6 +15,7 @@ import {CookieParam} from "@/utils/cookieParam.util";
 import {validateWithZodSchema} from "@/validations/zodSchema.validation";
 import {NextResponse} from "next/server";
 import {CustomError} from "@/utils/customError.util";
+import {StatusCodes} from "http-status-codes";
 
 export async function changeUserPassword(formData: FormData) {
     //----> Extract the parameters from formData.
@@ -28,8 +29,8 @@ export async function changeUserPassword(formData: FormData) {
 
     //----> Check validation error.
     const result = validateWithZodSchema(changeUserPasswordSchema, req)
-    if (result instanceof NextResponse) {
-        return NextResponse.json(result);
+    if (result instanceof CustomError) {
+        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
     }
 
     //----> Change the user password in the db.
@@ -61,8 +62,8 @@ export async function editUserProfile(formData: FormData){
 
     //----> Check validation error.
     const result = validateWithZodSchema(editProfileUserSchema, req)
-    if (result instanceof NextResponse) {
-        return NextResponse.json(result);
+    if (result instanceof CustomError) {
+        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
     }
 
     //----> Refresh user token.
@@ -83,7 +84,7 @@ export async function getCurrentUser(){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
     }
 
     //----> Send back response
@@ -101,15 +102,15 @@ export async function loginUser(formData: FormData){
 
     //----> Check validation error.
     const result = validateWithZodSchema(loginUserSchema, req)
-    if (result instanceof NextResponse) {
-        return NextResponse.json(result);
+    if (result instanceof CustomError) {
+        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
     }
 
      const userRes = await authModel.loginUser(req);
 
     //----> Check for error.
      if (userRes instanceof CustomError) {
-         return NextResponse.json(userRes);
+         return NextResponse.json(userRes, {status: StatusCodes.UNAUTHORIZED});
      }
 
      //----> Send back user response.
@@ -122,7 +123,7 @@ export async function logoutUser(){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
     }
 
     redirect("/")
@@ -137,7 +138,7 @@ export async function refreshUserTokenAction(){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
     }
 
     redirect("/")
@@ -161,8 +162,8 @@ export async function signupUser(formData: FormData){
 
     //----> Check validation error.
     const result = validateWithZodSchema(signupUserSchema, req)
-    if (result instanceof NextResponse) {
-        return NextResponse.json(result);
+    if (result instanceof CustomError) {
+        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
     }
 
     //----> Refresh user token.
@@ -170,7 +171,7 @@ export async function signupUser(formData: FormData){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
     }
 
     redirect("/")

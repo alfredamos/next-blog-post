@@ -1,19 +1,23 @@
-import {NextRequest, NextResponse} from "next/server";
+import {NextResponse} from "next/server";
 import {StatusCodes} from "http-status-codes";
 import {cookies} from "next/headers";
 import {CookieParam} from "@/utils/cookieParam.util";
 import {authModel} from "@/models/auth.model";
+import {CustomError} from "@/utils/customError.util";
 
-export async function POST(_request: NextRequest) {
-    console.log("In refresh-user")
+export async function POST() {
     //----> Get the refresh token.
     const cookieStore = await cookies();
     const refreshToken = cookieStore.get(CookieParam.refreshTokenName)?.value as string;
 
-
     //----> RefreshUser in the db.
-    const result  = await authModel.refreshUserToken(refreshToken);
+    const response  = await authModel.refreshUserToken(refreshToken);
+
+    //----> Check for error.
+    if (response instanceof CustomError) {
+        return NextResponse.json(response);
+    }
 
     //----> Send back response.
-    return NextResponse.json(result, {status: StatusCodes.OK});
+    return NextResponse.json(response, {status: StatusCodes.OK});
 }

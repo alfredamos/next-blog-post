@@ -1,9 +1,19 @@
 "use server"
 
 import {authModel} from "@/models/auth.model";
-import {ChangeUserPassword, EditUserProfile, LoginUser, SignupUser} from "@/validations/auth.validation";
+import {
+    ChangeUserPassword,
+    changeUserPasswordSchema, editProfileUserSchema,
+    EditUserProfile,
+    LoginUser, loginUserSchema,
+    SignupUser, signupUserSchema
+} from "@/validations/auth.validation";
 import {redirect} from "next/navigation";
 import {getLoggedInUserInfo} from "@/lib/getLoggedInUser";
+import {cookies} from "next/headers";
+import {CookieParam} from "@/utils/cookieParam.util";
+import {validateWithZodSchema} from "@/validations/zodSchema.validation";
+import {NextResponse} from "next/server";
 import {CustomError} from "@/utils/customError.util";
 
 export async function changeUserPassword(formData: FormData) {
@@ -15,8 +25,19 @@ export async function changeUserPassword(formData: FormData) {
         confirmPassword: cupReq.confirmPassword,
         newPassword: cupReq.password,
     }
+
+    //----> Check validation error.
+    const result = validateWithZodSchema(changeUserPasswordSchema, req)
+    if (result instanceof NextResponse) {
+        return NextResponse.json(result);
+    }
+
     //----> Change the user password in the db.
-    await authModel.changeUserPassword(req);
+    const response = await authModel.changeUserPassword(req);
+
+    if (response instanceof CustomError) {
+        return redirect("/login");
+    }
 
     return redirect("/");
 }
@@ -37,27 +58,37 @@ export async function editUserProfile(formData: FormData){
         dateOfBirth: editProfileOfUser.dateOfBirth as string,
         gender: editProfileOfUser.gender as  'Male' | 'Female',
     }
-    console.log("In editUserProfile, req : ", req);
+
+    //----> Check validation error.
+    const result = validateWithZodSchema(editProfileUserSchema, req)
+    if (result instanceof NextResponse) {
+        return NextResponse.json(result);
+    }
 
     //----> Refresh user token.
     const response = await authModel.editUserProfile(req);
 
-    if (!response?.status) {
+    if (response instanceof CustomError) {
         redirect("/login");
     }
 
-    console.log("In editUserProfile, req : ", response);
     return redirect("/");
 }
 
 
 export async function getCurrentUser(){
     const userResponse = await getLoggedInUserInfo()
-    //----> Get current user from db.
-    const authResponse = await authModel.getCurrentUser(userResponse.email);
+    //----> Get current user from db and send back response.
+    const response = await authModel.getCurrentUser(userResponse.email);
 
-    //----> Send back response.
-    return authResponse;
+    //----> Check for error.
+    if (response instanceof CustomError) {
+        return NextResponse.json(response);
+    }
+
+    //----> Send back response
+    return response;
+
 }
 
 export async function loginUser(formData: FormData){
@@ -67,10 +98,19 @@ export async function loginUser(formData: FormData){
         email: loginReq.email as string,
         password: loginReq.password as string,
     }
-    console.log("In login action, req : ", req);
+
+    //----> Check validation error.
+    const result = validateWithZodSchema(loginUserSchema, req)
+    if (result instanceof NextResponse) {
+        return NextResponse.json(result);
+    }
+
      const userRes = await authModel.loginUser(req);
 
-     console.log("In login action, userRes : ",userRes);
+    //----> Check for error.
+     if (userRes instanceof CustomError) {
+         return NextResponse.json(userRes);
+     }
 
      //----> Send back user response.
      return userRes;
@@ -78,15 +118,29 @@ export async function loginUser(formData: FormData){
 
 export async function logoutUser(){
     //----> Logout user.
-    console.log("In logout action, logout action");
     const response = await authModel.logoutUser();
-    console.log("In logout action, response : ", response);
+
+    //----> Check for error.
+    if (response instanceof CustomError) {
+        return NextResponse.json(response);
+    }
+
     redirect("/")
 }
 
-export async function refreshUserToken(refreshToken: string){
+export async function refreshUserTokenAction(){
     //----> Refresh user token.
-    return await authModel.refreshUserToken(refreshToken);
+    const cookieStore = await cookies();
+    const refreshToken = cookieStore?.get(CookieParam.refreshTokenName)?.value as string;
+
+    const response = await authModel.refreshUserToken(refreshToken);
+
+    //----> Check for error.
+    if (response instanceof CustomError) {
+        return NextResponse.json(response);
+    }
+
+    redirect("/")
 }
 
 export async function signupUser(formData: FormData){
@@ -104,11 +158,20 @@ export async function signupUser(formData: FormData){
         dateOfBirth: signupReq.dateOfBirth as string,
         gender: signupReq.gender as  'Male' | 'Female',
     }
-    console.log("In signupUser, req : ", req);
+
+    //----> Check validation error.
+    const result = validateWithZodSchema(signupUserSchema, req)
+    if (result instanceof NextResponse) {
+        return NextResponse.json(result);
+    }
 
     //----> Refresh user token.
     const response = await authModel.signupUser(req);
 
-    console.log("In signupUser, req : ", response);
+    //----> Check for error.
+    if (response instanceof CustomError) {
+        return NextResponse.json(response);
+    }
+
     redirect("/")
 }

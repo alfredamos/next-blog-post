@@ -1,13 +1,17 @@
 import {NextResponse} from "next/server";
 import {StatusCodes} from "http-status-codes";
 import {authModel} from "@/models/auth.model";
+import {CustomError} from "@/utils/customError.util";
 
 export async function POST() {
-    console.log("In logoutUser")
-
     //----> LogoutUser in the db.
-    const result  = await authModel.logoutUser();
+    const response  = await authModel.logoutUser();
+
+    //----> Check for error.
+    if (response instanceof CustomError) {
+        return NextResponse.json(response);
+    }
 
     //----> Send back response.
-    return NextResponse.json(result, {status: StatusCodes.OK});
+    return NextResponse.json(response, {status: StatusCodes.OK});
 }

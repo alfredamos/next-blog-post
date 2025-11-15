@@ -1,5 +1,5 @@
 import Link from "next/link";
-import AuthAndAdminMenu from "@/app/AuthAndAdminMenu";
+import AuthAndAdminMenu from "@/app/UI/AuthAndAdminMenu";
 
 
 const Navbar = () => {

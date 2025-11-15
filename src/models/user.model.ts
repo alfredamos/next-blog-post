@@ -11,12 +11,12 @@ class UserModel {
        //----> Fetch the user.
        const user = await this.getOneUser(id);
        if (!user) {
-           throw new CustomError("Not found", "User is not foud in db!", StatusCodes.NOT_FOUND);
+           return new CustomError("Not found", "User is not foud in db!", StatusCodes.NOT_FOUND);
        }
 
        //----> Check for ownership or admin.
        if (!await ownerCheckOrAdmin(id)){
-           throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+           return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
        }
 
        //----> Delete the user with the given id.
@@ -30,13 +30,13 @@ class UserModel {
    async getUserById(id: string) {
        //----> Check for ownership or admin.
        if (!await ownerCheckOrAdmin(id)){
-           throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+           return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
        }
 
        //----> Fetch the user.
        const user = await this.getOneUser(id);
        if (!user) {
-           throw new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
+           return new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
        }
        return  toUserDto(user);
 
@@ -45,7 +45,7 @@ class UserModel {
    async getAllUsers() {
        //----> Must be an admin.
        if (!await adminUserUtil()){
-           throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+           return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
        }
 
        //----> Fetch all users.

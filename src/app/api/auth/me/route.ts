@@ -4,9 +4,9 @@ import {cookies} from "next/headers";
 import {CookieParam} from "@/utils/cookieParam.util";
 import {TokenJwt} from "@/utils/tokenJwt.util";
 import {authModel} from "@/models/auth.model";
+import {CustomError} from "@/utils/customError.util";
 
 export async function GET() {
-    console.log("In get current user")
     //----> Get the session token.
     const cookieStore = await cookies();
     const sessionTokenString = cookieStore.get(CookieParam.sessionTokenName)?.value as string;
@@ -21,8 +21,13 @@ export async function GET() {
     const {email} = sessionToken;
 
     //----> Get current user in the db.
-    const result  = await authModel.getCurrentUser(email);
+    const response  = await authModel.getCurrentUser(email);
+
+    //----> Check for error.
+    if (response instanceof CustomError) {
+        return NextResponse.json(response);
+    }
 
     //----> Send back response.
-    return NextResponse.json(result, {status: StatusCodes.OK});
+    return NextResponse.json(response, {status: StatusCodes.OK});
 }

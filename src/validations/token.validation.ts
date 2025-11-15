@@ -4,10 +4,10 @@ import {TokenType} from "@prisma/client";
 export const tokenSchema = z.object({
     id: z.string().optional(),
     userId: z.string().optional(),
-    accessToken: z.string(),
-    refreshToken: z.string(),
-    expired: z.boolean(),
-    revoked: z.boolean(),
+    accessToken: z.string().min(1, { message: "Access-token cannot be empty." }),
+    refreshToken: z.string().min(1, { message: "Refresh-token cannot be empty." }),
+    expired: z.boolean().default(false),
+    revoked: z.boolean().default(false),
     tokenType: z.enum(TokenType)
 
 });

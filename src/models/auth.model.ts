@@ -21,15 +21,20 @@ class AuthModel{
 
         //----> Check for password match.
         if (!this.checkForPasswordMatch(confirmPassword, newPassword)){
-            throw new CustomError("Bad request", "Passwords don't match!", StatusCodes.BAD_REQUEST);
+            return new CustomError("Bad request", "Passwords don't match!", StatusCodes.BAD_REQUEST);
         }
 
         //----> Check for existence of user.
         const user = await this.getUserByEmail(email);
 
+        //----> Check for error
+        if (user instanceof CustomError) {
+            return user;
+        }
+
         //----> Check for valid password.
         if (! await this.checkForValidPassword(password, user.password)){
-            throw new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Hash the new password.
@@ -50,9 +55,14 @@ class AuthModel{
         //----> Check for existence of user.
         const user = await this.getUserByEmail(email);
 
+        //----> Check for error
+        if (user instanceof CustomError) {
+            return user;
+        }
+
         //----> Check for valid password.
         if (! await this.checkForValidPassword(password, user.password)){
-            throw new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Update the user.
@@ -62,6 +72,12 @@ class AuthModel{
 
         //----> Update author.
         const author = await this.getAuthorByEmail(email);
+
+        //----> Check for error
+        if (author instanceof CustomError) {
+            return author;
+        }
+
         const updatedAuthor = {...fromEditProfileToAuthorUtil(req, user.id), id: author.id};
         await prisma.author.update({where: {email}, data: {...updatedAuthor}});
 
@@ -71,7 +87,14 @@ class AuthModel{
 
     getCurrentUser = async (email:string) => {
         //----> Fetch the current user from db.
-        return toUserDto(await this.getUserByEmail(email));
+        const user = await this.getUserByEmail(email);
+
+        //----> Check for error
+        if (user instanceof CustomError) {
+            return user;
+        }
+
+        return toUserDto(user);
     }
 
 
@@ -82,9 +105,14 @@ class AuthModel{
         //----> Check for existence of user.
         const user = await this.getUserByEmail(email);
 
+        //----> Check for error
+        if (user instanceof CustomError) {
+            return user;
+        }
+
         //----> Check for valid password.
         if (! await this.checkForValidPassword(password, user.password)){
-            throw new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Generate access and refresh tokens and store them in cookies and send back access token.
@@ -98,13 +126,18 @@ class AuthModel{
 
         //----> Check for null access token.
         if (!accessToken) {
-            throw new CustomError("Null Token", "You have already logged out!", StatusCodes.UNAUTHORIZED);
+            return new CustomError("Null Token", "You have already logged out!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Get the valid token object.
         const tokenObject = await tokenModel.findTokenByAccessToken(accessToken);
         if (!tokenObject){
-            throw new CustomError("Token is empty", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            return new CustomError("Token is empty", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+        }
+
+        //----> Check for error.
+        if (tokenObject instanceof CustomError) {
+            return tokenObject;
         }
 
         //----> Revoke all valid tokens.
@@ -127,7 +160,7 @@ class AuthModel{
     refreshUserToken = async (refreshToken: string) => {
         //----> Check for null refresh token.
         if (!refreshToken) {
-            throw new CustomError("No refreshToken", "Your refresh token has expired", StatusCodes.UNAUTHORIZED);
+            return  new CustomError("No refreshToken", "Your refresh token has expired", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Validate refresh token.
@@ -135,7 +168,7 @@ class AuthModel{
 
         //----> Check for null userToken
         if (!userToken) {
-            throw new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Generate access and refresh tokens and store them in cookies and send back access token.
@@ -149,13 +182,13 @@ class AuthModel{
 
         //----> Check for password match.
         if (!this.checkForPasswordMatch(password, confirmPassword)){
-            throw new CustomError("UnAuthorized", "Passwords don't match!", StatusCodes.BAD_REQUEST);
+            return new CustomError("UnAuthorized", "Passwords don't match!", StatusCodes.BAD_REQUEST);
         }
 
         //----> Check for existence of user.
         const user = await prisma.user.findUnique({where: {email}})
         if (user){
-            throw new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Hash password.
@@ -187,7 +220,7 @@ class AuthModel{
 
         //----> Check for null user.
         if(!user){
-            throw new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Send back result.
@@ -200,7 +233,7 @@ class AuthModel{
 
         //----> Check for null author.
         if(!author){
-            throw new CustomError("Not found", "Author is not found in db!", StatusCodes.NOT_FOUND);
+            return new CustomError("Not found", "Author is not found in db!", StatusCodes.NOT_FOUND);
         }
 
         //----> Send back result.
@@ -236,8 +269,7 @@ class AuthModel{
 
         //----> Set the cookie-session.
         const userResponse: UserResponse = {id: user.id, name: user.name, email: user.email, role: user.role, isLoggedIn: true, isAdmin: user.role === Role.Admin, accessToken}
-        await
-            this.setCookie(CookieParam.sessionTokenName, JSON.stringify(userResponse), CookieParam.sessionTokenPath, CookieParam.sessionTokenExpireIn)
+        await this.setCookie(CookieParam.sessionTokenName, JSON.stringify(userResponse), CookieParam.sessionTokenPath, CookieParam.sessionTokenExpireIn)
 
 
         //----> Make token object and store it in token db.

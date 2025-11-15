@@ -2,10 +2,10 @@ import {z} from "zod";
 import {Gender} from "@prisma/client";
 
 export const changeUserPasswordSchema = z.object({
-    email: z.string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/),
-    password: z.string(),
-    newPassword: z.string(),
-    confirmPassword: z.string()
+    email: z.string().min(1, { message: "Email cannot be empty." }).regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/),
+    password: z.string().min(1, { message: "Password cannot be empty." }),
+    newPassword: z.string().min(1, { message: "NewPassword cannot be empty." }),
+    confirmPassword: z.string().min(1, { message: "ConfirmPassword cannot be empty." })
 }).refine((values) => values.newPassword.normalize() === values.newPassword.normalize(),
     {
         message: "Passwords do not match",
@@ -15,22 +15,22 @@ export const changeUserPasswordSchema = z.object({
 export type ChangeUserPassword = z.infer<typeof changeUserPasswordSchema>
 
 export const loginUserSchema = z.object({
-    email: z.string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/),
-    password: z.string(),
+    email: z.string().min(1, { message: "Email cannot be empty." }).regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/),
+    password: z.string().min(1, { message: "Password cannot be empty." }),
 });
 
 export type LoginUser = z.infer<typeof loginUserSchema>
 
 export const signupUserSchema = z.object({
-    address: z.string(),
-    name: z.string(),
-    email: z.string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/),
-    phone: z.string(),
-    image: z.string(),
+    address: z.string().min(1, { message: "Address cannot be empty." }),
+    name: z.string().min(1, { message: "Name cannot be empty." }),
+    email: z.string().min(1, { message: "Email cannot be empty." }).regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/),
+    phone: z.string().min(1, { message: "Phone cannot be empty." }),
+    image: z.string().min(1, { message: "Image cannot be empty." }),
     gender: z.enum(Gender),
-    dateOfBirth: z.string(),
-    password: z.string(),
-    confirmPassword: z.string(),
+    dateOfBirth: z.string().min(1, { message: "DateOfBirth cannot be empty." }),
+    password: z.string().min(1, { message: "Password cannot be empty." }),
+    confirmPassword: z.string().min(1, { message: "ConfirmPassword cannot be empty." }),
 }).refine((values) => values.password.normalize() === values.confirmPassword.normalize(),
     {
         message: "Passwords do not match",
@@ -40,14 +40,14 @@ export const signupUserSchema = z.object({
 export type SignupUser = z.infer<typeof signupUserSchema>
 
 export const editProfileUserSchema = z.object({
-    address: z.string(),
-    name: z.string(),
-    email: z.string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/),
-    phone: z.string(),
-    image: z.string(),
+    address: z.string().min(1, { message: "Address cannot be empty." }),
+    name: z.string().min(1, { message: "Name cannot be empty." }),
+    email: z.string().min(1, { message: "Email cannot be empty." }).regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/),
+    phone: z.string().min(1, { message: "Phone cannot be empty." }),
+    image: z.string().min(1, { message: "Image cannot be empty." }),
     gender: z.enum(Gender),
-    dateOfBirth: z.string(),
-    password: z.string(),
+    dateOfBirth: z.string().min(1, { message: "DateOfBirth cannot be empty." }),
+    password: z.string().min(1, { message: "Password cannot be empty." }),
 });
 
 export type EditUserProfile = z.infer<typeof editProfileUserSchema>

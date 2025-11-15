@@ -2,6 +2,9 @@ import {NextRequest, NextResponse} from "next/server";
 import {StatusCodes} from "http-status-codes";
 import {Post} from ".prisma/client";
 import {postModel} from "@/models/post.model";
+import {validateWithZodSchema} from "@/validations/zodSchema.validation";
+import {postSchema} from "@/validations/post.validation";
+import {CustomError} from "@/utils/customError.util";
 
 export async function GET(){
     //----> Fetch all posts.
@@ -15,10 +18,21 @@ export async function POST(request:NextRequest){
    //----> Get the post payload from request object.
    const post = await request.json() as Post;
 
+    //----> Check validation error.
+    const result = validateWithZodSchema(postSchema, post)
+    if (result instanceof NextResponse) {
+        return NextResponse.json(result);
+    }
+
    //----> Insert the new post into db.
     const newPost = await postModel.createPost(post);
 
+    //----> Check for error.
+    if (newPost instanceof CustomError) {
+        return NextResponse.json(newPost);
+    }
+
     //----> Send back response.
-    return NextResponse.json(newPost);
+    return NextResponse.json(newPost, {status: StatusCodes.CREATED});
 
 }

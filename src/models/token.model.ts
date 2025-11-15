@@ -21,7 +21,7 @@ class TokenModel{
     async deleteInvalidTokensByUserId(userId: string){
         //----> Check for ownership or admin.
         if (!await ownerCheckOrAdmin(userId)){
-            throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+            return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
         }
 
         //----> Retrieve invalid tokens by user id.
@@ -38,7 +38,7 @@ class TokenModel{
     async deleteAllInvalidTokens(){
         //----> Must be an admin.
         if (!await adminUserUtil()){
-            throw new CustomError("Forbidden", "You don't permission to view or perform this action!", StatusCodes.FORBIDDEN)
+            return new CustomError("Forbidden", "You don't permission to view or perform this action!", StatusCodes.FORBIDDEN)
         }
 
         //----> Retrieve all invalid tokens.
@@ -55,7 +55,7 @@ class TokenModel{
         //----> Fetch the token object with the given access-token.
         const token = await this.getOneToken(accessToken);
         if (!token) {
-            throw new CustomError("Not found", "Token is not foud in db!", StatusCodes.NOT_FOUND);
+            return new CustomError("Not found", "Token is not foud in db!", StatusCodes.NOT_FOUND);
         }
 
         //----> Send back response.
@@ -100,7 +100,7 @@ class TokenModel{
 
         //----> Check for empty counts.
         if (!batchDeletedTokens.count) {
-            throw new CustomError("Not found", "No invalid tokens to delete!", StatusCodes.NOT_FOUND);
+            return new CustomError("Not found", "No invalid tokens to delete!", StatusCodes.NOT_FOUND);
         }
 
         //----> Send back response.

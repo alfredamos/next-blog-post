@@ -1,8 +1,8 @@
 "use client"
 
 import Dropdown from "@/components/Dropdown";
-import {settingItems} from "@/app/settingItemLinks";
-import {adminItems} from "@/app/adminItemLinks";
+import {settingItems} from "@/app/UI/settingItemLinks";
+import {adminItems} from "@/app/types/adminItemLinks";
 import Form from "next/form";
 import Link from "next/link";
 import {useLocalStorage} from "@/hooks/useLocalStorage";

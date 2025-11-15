@@ -11,12 +11,12 @@ class AuthorModel{
        //----> Fetch the author with the given id.
        const author = await this.getOneAuthor(id);
        if (!author) {
-           throw new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
+           return new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
        }
 
         //----> Check for ownership or admin.
         if (!await ownerCheckOrAdmin(author.userId)){
-            throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+            return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
         }
 
        //----> Delete the user and the associated author.
@@ -30,12 +30,12 @@ class AuthorModel{
        //----> Fetch the author with the given id.
        const author = await this.getOneAuthor(id);
         if (!author) {
-            throw new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
+            return new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
         }
 
        //----> Check for ownership or admin.
         if (!await ownerCheckOrAdmin(author.userId)){
-            throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+            return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
         }
 
        //----> Calculate age.
@@ -48,7 +48,7 @@ class AuthorModel{
        //----> Edit associated user.
        const user = await this.getOneUser(author.userId);
        if (!user) {
-           throw new CustomError("Not found", "User is not foud in db!", StatusCodes.NOT_FOUND);
+           return new CustomError("Not found", "User is not foud in db!", StatusCodes.NOT_FOUND);
        }
        user.name = editedAuthor.name;
        user.image = editedAuthor.image;
@@ -62,12 +62,12 @@ class AuthorModel{
         //----> Fetch the author with the given id.
         const author = await this.getOneAuthor(id);
         if (!author) {
-            throw new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
+            return new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
         }
 
         //----> Check for ownership or admin.
         if (!await ownerCheckOrAdmin(author.userId)){
-            throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+            return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
         }
 
         //----> Send back response.
@@ -78,12 +78,12 @@ class AuthorModel{
         //----> Fetch the author with the given email.
         const author = await prisma.author.findUnique({where: { email }});
         if (!author) {
-            throw new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
+            return new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
         }
 
         //----> Check for ownership or admin.
         if (!await ownerCheckOrAdmin(author.userId)){
-            throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+            return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
         }
 
         //----> Send back response.
@@ -93,7 +93,7 @@ class AuthorModel{
     async getAllAuthors() {
         //----> Must be an admin.
         if (!await adminUserUtil()){
-            throw new CustomError("Forbidden", "You don't have permission to view or perform this action!", StatusCodes.FORBIDDEN)
+            return new CustomError("Forbidden", "You don't have permission to view or perform this action!", StatusCodes.FORBIDDEN)
         }
 
         //----> Fetch all authors.

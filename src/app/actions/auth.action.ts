@@ -13,9 +13,7 @@ import {getLoggedInUserInfo} from "@/lib/getLoggedInUser";
 import {cookies} from "next/headers";
 import {CookieParam} from "@/utils/cookieParam.util";
 import {validateWithZodSchema} from "@/validations/zodSchema.validation";
-import {NextResponse} from "next/server";
 import {CustomError} from "@/utils/customError.util";
-import {StatusCodes} from "http-status-codes";
 
 export async function changeUserPassword(formData: FormData) {
     //----> Extract the parameters from formData.
@@ -30,14 +28,15 @@ export async function changeUserPassword(formData: FormData) {
     //----> Check validation error.
     const result = validateWithZodSchema(changeUserPasswordSchema, req)
     if (result instanceof CustomError) {
-        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
+        throw new CustomError(result.name, result.message, result.status);
     }
 
     //----> Change the user password in the db.
     const response = await authModel.changeUserPassword(req);
 
+    //----> Check for response error.
     if (response instanceof CustomError) {
-        return redirect("/login");
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     return redirect("/");
@@ -63,14 +62,15 @@ export async function editUserProfile(formData: FormData){
     //----> Check validation error.
     const result = validateWithZodSchema(editProfileUserSchema, req)
     if (result instanceof CustomError) {
-        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
+        throw new CustomError(result.name, result.message, result.status);
     }
 
     //----> Refresh user token.
     const response = await authModel.editUserProfile(req);
 
+    //----> Check for response error.
     if (response instanceof CustomError) {
-        redirect("/login");
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     return redirect("/");
@@ -84,7 +84,7 @@ export async function getCurrentUser(){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     //----> Send back response
@@ -101,16 +101,17 @@ export async function loginUser(formData: FormData){
     }
 
     //----> Check validation error.
-    const result = validateWithZodSchema(loginUserSchema, req)
-    if (result instanceof CustomError) {
-        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
+    const response = validateWithZodSchema(loginUserSchema, req)
+    if (response instanceof CustomError) {
+        throw new CustomError(response.name, response.message, response.status);
     }
 
+    //----> Login user.
      const userRes = await authModel.loginUser(req);
 
     //----> Check for error.
      if (userRes instanceof CustomError) {
-         return NextResponse.json(userRes, {status: StatusCodes.UNAUTHORIZED});
+         throw new CustomError(userRes.name, userRes.message, userRes.status);
      }
 
      //----> Send back user response.
@@ -123,7 +124,7 @@ export async function logoutUser(){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     redirect("/")
@@ -138,7 +139,7 @@ export async function refreshUserTokenAction(){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     redirect("/")
@@ -163,7 +164,7 @@ export async function signupUser(formData: FormData){
     //----> Check validation error.
     const result = validateWithZodSchema(signupUserSchema, req)
     if (result instanceof CustomError) {
-        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
+        throw new CustomError(result.name, result.message, result.status);
     }
 
     //----> Refresh user token.
@@ -171,7 +172,7 @@ export async function signupUser(formData: FormData){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     redirect("/")

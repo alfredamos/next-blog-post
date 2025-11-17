@@ -12,17 +12,17 @@ export async function createPost(req: Post){
     //----> Check validation error.
     const result = validateWithZodSchema(postSchema, req)
     if (result instanceof CustomError) {
-        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
+        throw new CustomError(result.name, result.message, result.status);
     }
     //----> Insert new post into db.
     const response = await postModel.createPost(req);
 
     if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR})
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     //----> Send back response.
-    return NextResponse.json(response, {status: StatusCodes.OK});
+    return response;
 
 }
 
@@ -31,11 +31,11 @@ export async function deletePostById(id:string){
     const response = await postModel.deletePostById(id);
 
     if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR})
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     //----> Send back response.
-    return NextResponse.json(response, {status: StatusCodes.OK});
+    return response;
 
 }
 
@@ -44,11 +44,11 @@ export async function deletePostsByAuthorId(authorId:string){
     const response = await postModel.deletePostByAuthorId(authorId);
 
     if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR})
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     //----> Send back response.
-    return NextResponse.json(response, {status: StatusCodes.OK});
+    return response;
 
 }
 
@@ -56,17 +56,17 @@ export async function editPostById(id:string, req:Post){
     //----> Check validation error.
     const result = validateWithZodSchema(postSchema, req)
     if (result instanceof CustomError) {
-        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
+        throw new CustomError(result.name, result.message, result.status);
     }
     //----> Edit the post with the given id.
     const response = await postModel.editPostById(id, req);
 
     if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR})
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     //----> Send back response.
-    return NextResponse.json(response, {status: StatusCodes.OK});
+    return response;
 
 }
 
@@ -75,11 +75,11 @@ export async function getPostById(id:string){
     const response = await postModel.getPostById(id);
 
     if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR})
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     //----> Send back response.
-    return NextResponse.json(response, {status: StatusCodes.OK});
+    return response;
 
 }
 
@@ -88,7 +88,7 @@ export async function getAllPosts(){
     const response = await postModel.getAllPosts();
 
     //----> Send back response.
-    return NextResponse.json(response, {status: StatusCodes.OK});
+    return response;
 }
 
 export async function getPostsByAuthorId(authorId:string){
@@ -97,10 +97,10 @@ export async function getPostsByAuthorId(authorId:string){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     //----> Send back response.
-    return NextResponse.json(response, {status: StatusCodes.OK});
+    return response;
 }
 

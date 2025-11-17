@@ -126,32 +126,24 @@ class AuthModel{
 
         //----> Check for null access token.
         if (!accessToken) {
+            await this.deleteAllCookies();
             return new CustomError("Null Token", "You have already logged out!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Get the valid token object.
         const tokenObject = await tokenModel.findTokenByAccessToken(accessToken);
-        if (!tokenObject){
+
+        if (!tokenObject ||(tokenObject instanceof CustomError)){
             return new CustomError("Token is empty", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
         }
 
-        //----> Check for error.
-        if (tokenObject instanceof CustomError) {
-            return tokenObject;
-        }
+        //----> Delete access-token, refresh-token and session-token.
+        await this.deleteCookie(CookieParam.accessTokenName);
+        await this.deleteCookie(CookieParam.refreshTokenName);
+        await this.deleteCookie(CookieParam.sessionTokenName);
 
         //----> Revoke all valid tokens.
         await tokenModel.revokedTokensByUserId(tokenObject.userId);
-
-        //----> Delete access, session and refresh cookies.
-        await this.deleteCookie(CookieParam.accessTokenName);
-        await this.deleteCookie(CookieParam.refreshTokenName);
-
-        //----> Nullified session-token
-        const userResponse: UserResponse = {id: "", name: "", email: "", role: Role.User, isLoggedIn: false, isAdmin: false, accessToken: ""}
-        await
-            this.setCookie(CookieParam.sessionTokenName, JSON.stringify(userResponse), CookieParam.sessionTokenPath, CookieParam.sessionTokenExpireIn)
-
 
         //----> Send back response.
         return new ResponseMessageUtil("Logout is successfully!", "success", StatusCodes.OK);
@@ -313,11 +305,16 @@ class AuthModel{
     }
 
     private deleteCookie = async (cookieName: string) => {
-        // deleteCookie(cookieName, { path: cookiePath });
         const cookieStore = await cookies();
         cookieStore.delete(cookieName);
    }
 
+   private deleteAllCookies = async () => {
+        await this.deleteCookie(CookieParam.accessTokenName);
+        await this.deleteCookie(CookieParam.refreshTokenName);
+        await this.deleteCookie(CookieParam.sessionTokenName);
+
+   }
 
 }
 

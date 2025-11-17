@@ -1,9 +1,9 @@
 import {getAllPosts} from "@/app/actions/post.action";
 
 export default async function GetAllPosts() {
-   const posts = await getAllPosts();
-   console.log(posts);
-    return(
-        <h1 className="px-4 mt-10">All posts</h1>
-    )
+   const allPosts = await getAllPosts();
+    return (
+        <>{allPosts.map(post => <h2 key={post.id} className="pl-50">{post.title}</h2>)
+        }</>
+    );
 }

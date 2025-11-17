@@ -16,9 +16,10 @@ export default function LoginForm() {
     const loginSubmitHandler = async (formData: FormData) => {
         try {
             const response = await loginAction(formData); //----> Login.
-            console.log("In login : ", {response})
-            setUserResponse(response as UserResponse);
-            setLocalStorage(LocalStorageParam.userResp, response)
+
+            //----> Set both the auth-context and local-storage.
+            setUserResponse(response);
+            setLocalStorage(LocalStorageParam.userResp, response as UserResponse)
 
         } catch (error) {
             console.error(error); //----> Show toast for successful login.

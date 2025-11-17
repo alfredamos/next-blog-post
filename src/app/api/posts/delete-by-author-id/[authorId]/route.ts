@@ -1,6 +1,7 @@
 import {NextResponse} from "next/server";
 import {postModel} from "@/models/post.model";
 import {CustomError} from "@/utils/customError.util";
+import {StatusCodes} from "http-status-codes";
 
 export async function DELETE(_request: Request, {params}: {params: Promise<{authorId: string}>}){
     //----> Get the authorId from params.
@@ -11,7 +12,7 @@ export async function DELETE(_request: Request, {params}: {params: Promise<{auth
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.NOT_FOUND});
     }
 
     //----> Send back response.

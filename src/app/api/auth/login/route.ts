@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     //----> Check validation error.
     const result = validateWithZodSchema(loginUserSchema, loginUser)
     if (result instanceof CustomError) {
-        return NextResponse.json(result, {status: StatusCodes.UNAUTHORIZED});
+        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
     }
 
     //----> LoginUser in the db.
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response);
+        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR});
     }
 
     //----> Send back response.

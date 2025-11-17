@@ -8,15 +8,12 @@ export default async function EditProfilePage() {
     //----> Get user session.
     const userResponse = await getLoggedInUserInfo();
 
-    console.log("In edit user profile, userResponse : ", userResponse);
-
     //----> Check for null session.
     if (!userResponse) unauthorized();
 
     //----> Get the author associated with this user.
     const author = await getAuthorEmail(userResponse.email) as Author;
 
-    console.log("In edit user profile, author : ", author);
     return (
         <EditProfileForm author={author}/>
     );

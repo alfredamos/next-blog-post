@@ -15,7 +15,7 @@ export async function deleteAuthorId(id: string){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     //----> Redirect to all authors
@@ -28,7 +28,7 @@ export async function editAuthorId(id: string, req: Author){
 
     //----> Check for validation errors
     if (result instanceof CustomError) {
-        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
+        throw new CustomError(result.name, result.message, result.status);
     }
 
     //----> Edit the author with the given id.
@@ -36,7 +36,7 @@ export async function editAuthorId(id: string, req: Author){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR});
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     //----> Redirect to all authors.
@@ -48,12 +48,12 @@ export async function getAuthorEmail(email: string){
     const response = await authorModel.getAuthorByEmail(email);
 
     //----> Check for error.
-    if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR});
+    if (response instanceof CustomError){
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     //----> Send back response.
-    return NextResponse.json(response, {status: StatusCodes.OK});
+    return response;
 }
 
 export async function getAuthorId(id: string){
@@ -62,11 +62,11 @@ export async function getAuthorId(id: string){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR});
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     //----> Send back response.
-    return NextResponse.json(response, {status: StatusCodes.OK});
+    return response;
 
 }
 
@@ -76,9 +76,9 @@ export async function getAllAuthors(){
 
     //----> Check for error.
     if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR});
+        throw new CustomError(response.name, response.message, response.status);
     }
 
     //----> Send back response.
-    return NextResponse.json(response, {status: StatusCodes.OK});
+    return response;
 }

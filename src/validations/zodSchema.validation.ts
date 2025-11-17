@@ -11,8 +11,8 @@ export function validateWithZodSchema<T>(
 
     //----> Check for error
     if (!result.success) {
+        //----> Extract error message.
         const errors = extractZodErrorMessages(result.error);
-        console.log("In zod-validate, errors : ", errors);
         return new CustomError("Validation Error", errors.join(", "), StatusCodes.BAD_REQUEST);
     }
     return result;

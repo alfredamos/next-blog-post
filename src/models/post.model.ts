@@ -69,7 +69,7 @@ class PostModel{
             }});
 
         //----> Check for existence of deletedPosts.
-        if (!deletedPosts?.count) throw new CustomError("Not found", "This is author has no posts to delete!", StatusCodes.NOT_FOUND);
+        if (!deletedPosts?.count) return new CustomError("Not found", "This is author has no posts to delete!", StatusCodes.NOT_FOUND);
 
 
         //----> Send back response.

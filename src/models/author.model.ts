@@ -90,10 +90,22 @@ class AuthorModel{
         return author;
     }
 
-    async getAllAuthors() {
+    async getAllAuthors(query?: string) {
         //----> Must be an admin.
         if (!await adminUserUtil()){
             return new CustomError("Forbidden", "You don't have permission to view or perform this action!", StatusCodes.FORBIDDEN)
+        }
+
+        //----> Get authors marching the giving query.
+        if(query){
+            return prisma.author.findMany({where: {
+            OR:[
+                {address : {contains : query}},
+                {email : {contains : query}},
+                {name : {contains : query}},
+                {phone : {contains : query}},
+            ],}
+            });
         }
 
         //----> Fetch all authors.

@@ -12,7 +12,7 @@ export function useLocalStorage<T>(){
 
     const getLocalStorage = (key: string) => {
         const value =  ls.get<T>(key);
-        console.log("In get-local-storage, key : ", key, "value: ", value);
+        console.log("In detail-local-storage, key : ", key, "value: ", value);
         return value;
     }
 

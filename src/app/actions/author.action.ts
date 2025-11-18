@@ -70,9 +70,9 @@ export async function getAuthorId(id: string){
 
 }
 
-export async function getAllAuthors(){
+export async function getAllAuthors(query?: string){
     //----> Fetch all authors from db.
-    const response = await authorModel.getAllAuthors();
+    const response = await authorModel.getAllAuthors(query);
 
     //----> Check for error.
     if (response instanceof CustomError) {

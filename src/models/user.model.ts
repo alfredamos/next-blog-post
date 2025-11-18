@@ -42,10 +42,20 @@ class UserModel {
 
    }
 
-   async getAllUsers() {
+   async getAllUsers(query?: string) {
        //----> Must be an admin.
        if (!await adminUserUtil()){
            return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+       }
+
+       //----> Get users marching the giving query.
+       if(query){
+           return prisma.user.findMany({where: {
+                   OR:[
+                       {email : {contains : query}},
+                       {name : {contains : query}},
+                   ],}
+           });
        }
 
        //----> Fetch all users.

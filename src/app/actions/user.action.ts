@@ -31,12 +31,12 @@ export async function getUserById(id:string){
     }
 
     //----> Send back response.
-    redirect("/users");
+    return response;
 }
 
-export async function getAllUsers(){
+export async function getAllUsers(query?:string){
     //----> Fetch all users from db.
-    const response = await userModel.getAllUsers();
+    const response = await userModel.getAllUsers(query);
 
     //----> Check for error.
     if (response instanceof CustomError) {

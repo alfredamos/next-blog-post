@@ -3,9 +3,9 @@ import {StatusCodes} from "http-status-codes";
 import {userModel} from "@/models/user.model";
 import {CustomError} from "@/utils/customError.util";
 
-export  async function GET() {
+export  async function GET(query?: string) {
     //----> Fetch all users from db.
-    const response = await userModel.getAllUsers();
+    const response = await userModel.getAllUsers(query);
 
     //----> Check for error.
     if (response instanceof CustomError) {

@@ -2,20 +2,24 @@
 
 import { useState, useRef, useEffect, ReactNode } from 'react';
 import Link from 'next/link';
-import { ChevronDown } from 'lucide-react'; // Example using lucide-react icons
+import { ChevronDown } from 'lucide-react';
+
+// Example using lucide-react icons
 
 interface DropdownItemProps {
     href: string;
     children: ReactNode;
 }
 
-const DropdownItem = ({ href, children }: DropdownItemProps) => (
+const DropdownItem = ({ href, children}: DropdownItemProps) => (
     <Link
         href={href}
         className="block px-4 py-2 font-medium text-sm text-gray-700 hover:bg-gray-100"
     >
         {children}
     </Link>
+
+
 );
 
 interface DropdownProps {
@@ -25,6 +29,7 @@ interface DropdownProps {
 
 const Dropdown = ({ title, items }: DropdownProps) => {
     const [isOpen, setIsOpen] = useState(false);
+
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const toggleDropdown = () => setIsOpen(!isOpen);

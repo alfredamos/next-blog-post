@@ -13,7 +13,7 @@ export async function GET() {
 
     //----> Check for null session.
     if (!sessionTokenString) {
-        return NextResponse.json({ error: "Could not get session token from session token!" }, { status: StatusCodes.UNAUTHORIZED });
+        return NextResponse.json({ error: "Could not detail session token from session token!" }, { status: StatusCodes.UNAUTHORIZED });
     }
 
     //----> Get the session.

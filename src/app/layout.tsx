@@ -22,7 +22,7 @@ export default function RootLayout({
         <html lang="en">
             {/*<body className={inter.className}>*/}
             <AuthContext>
-                <body className="bg-white min-h-screen text-black dark:text-white">
+                <body className="bg-black min-h-screen text-black dark:text-white">
                     <NavigationBar/>
                     {children}
                 </body>

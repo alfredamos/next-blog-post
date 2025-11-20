@@ -17,7 +17,7 @@ export async function ownerCheckOrAdmin(userIdOnResource: string) {
     if (!isSameId && !isAdmin) {
         return false;
     }
-
+    console.log("ownerCheckOrAdmin", userId, isAdmin);
     //----> Is either admin or owner.
     return true;
 

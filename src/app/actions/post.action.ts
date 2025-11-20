@@ -4,11 +4,17 @@ import {Post} from ".prisma/client";
 import {postModel} from "@/models/post.model";
 import {validateWithZodSchema} from "@/validations/zodSchema.validation";
 import {postSchema} from "@/validations/post.validation";
-import {NextResponse} from "next/server";
-import {StatusCodes} from "http-status-codes";
 import {CustomError} from "@/utils/customError.util";
+import {revalidatePath} from "next/cache";
 
-export async function createPost(req: Post){
+export async function createPost(formData: FormData) {
+    //----> Get the post payload from formData.
+    const postPayload = Object.fromEntries(formData.entries()) as Post;
+
+    const {title, content, imageUrl} = postPayload;
+    const req = {title, content, imageUrl} as Post;
+    console.log("In create-post, req : ", req);
+
     //----> Check validation error.
     const result = validateWithZodSchema(postSchema, req)
     if (result instanceof CustomError) {
@@ -22,7 +28,7 @@ export async function createPost(req: Post){
     }
 
     //----> Send back response.
-    return response;
+    revalidatePath("/");
 
 }
 
@@ -35,7 +41,7 @@ export async function deletePostById(id:string){
     }
 
     //----> Send back response.
-    return response;
+    revalidatePath("/");
 
 }
 
@@ -52,7 +58,14 @@ export async function deletePostsByAuthorId(authorId:string){
 
 }
 
-export async function editPostById(id:string, req:Post){
+export async function editPostById(formData:FormData){
+    //----> Get the edited-post payload.
+    const {id, title, content, imageUrl} = Object.fromEntries(formData.entries()) as Post;
+
+    const req = {id, title, content, imageUrl} as Post;
+
+    console.log("In edit post, req : ", req);
+
     //----> Check validation error.
     const result = validateWithZodSchema(postSchema, req)
     if (result instanceof CustomError) {
@@ -66,7 +79,7 @@ export async function editPostById(id:string, req:Post){
     }
 
     //----> Send back response.
-    return response;
+    revalidatePath("/")
 
 }
 

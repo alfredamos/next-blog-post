@@ -11,6 +11,9 @@ class PostModel{
         //----> Get the current user info.
         const userAuth = await getLoggedInUserInfo();
 
+        console.log("In create-post, post : ", postToCreate);
+        console.log("In create-post, userAuth : ", userAuth);
+
         //----> Get the author associated with user.
         const author = await this.getOneAuthor(userAuth.id)
         if (!author) {
@@ -24,12 +27,14 @@ class PostModel{
     async deletePostById(id:string){
         //----> Fetch the post with given id.
         const post = await this.getOnePost(id);
+        console.log("In delete-post-by-id, post : ", post);
         if (!post) {
             return new CustomError("Not found", "Post is not foud in db!", StatusCodes.NOT_FOUND);
         }
 
         //----> Check for ownership or admin.
         const author = await prisma.author.findUnique({where:{id: post.authorId as string}});
+        console.log("In delete-post-by-id, author : ", author);
         if (!author) {
             return new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
         }
@@ -41,7 +46,7 @@ class PostModel{
         await prisma.post.delete({where:{id}});
 
         //----> Send back response.
-        return new ResponseMessageUtil("Post has been deleted successfully!", "success", StatusCodes.OK)
+        return post
     }
 
     async deletePostByAuthorId(authorId:string){
@@ -136,12 +141,12 @@ class PostModel{
         return prisma.post.findMany({where: {authorId}});
     }
 
-    private async getOneAuthor(userId: string){
+    private getOneAuthor = async (userId: string) =>{
         //----> Fetch the author with the given id from db.
         return prisma.author.findUnique({where: {userId}});
     }
 
-    private async getOnePost(id: string){
+    private getOnePost = async (id: string)=>{
         //----> Fetch the post with the given id from db.
         return prisma.post.findUnique({where: {id}});
 

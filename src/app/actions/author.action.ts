@@ -7,7 +7,6 @@ import {authorSchema} from "@/validations/author.validation";
 import {CustomError} from "@/utils/customError.util";
 import {redirect} from "next/navigation";
 import {revalidatePath} from "next/cache";
-import {Post} from ".prisma/client";
 
 export async function deleteAuthorId(id: string){
     //----> Delete the author with given id.

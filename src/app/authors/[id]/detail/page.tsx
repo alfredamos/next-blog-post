@@ -10,7 +10,7 @@ export default async function GetAuthorByIdPage({params}:{params: Promise<{id: s
 
     return (
         <Card name={author.name} address={author.address} image={author.image} path="authors" >
-            <DetailPostCardButtons id={id} isAddButton={false} path="authors"/>
+            <DetailPostCardButtons id={id} isAddButton={false} isEditButton={true} path="authors"/>
         </Card>
 
     );

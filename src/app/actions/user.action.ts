@@ -1,11 +1,9 @@
 "use server"
 
-
 import {userModel} from "@/models/user.model";
-import {NextResponse} from "next/server";
 import {CustomError} from "@/utils/customError.util";
 import {redirect} from "next/navigation";
-import {StatusCodes} from "http-status-codes";
+import {revalidatePath} from "next/cache";
 
 export async function deleteUserById(id:string){
     //----> Delete the user with the given id.
@@ -17,6 +15,7 @@ export async function deleteUserById(id:string){
     }
 
     //----> Send back response.
+    revalidatePath("/users")
     redirect("/users")
 
 }

@@ -1,4 +1,5 @@
 import {getUserById} from "@/app/actions/user.action";
+import DeleteUser from "@/app/users/[id]/delete/DeleteUser";
 
 export default async function DeleteUserPage({params}:{params: Promise<{id: string}>}){
     console.log("At point 1, in delete user page, params: ", await params);
@@ -9,6 +10,6 @@ export default async function DeleteUserPage({params}:{params: Promise<{id: stri
     console.log("At point 2, in delete user page, user: ", user);
 
     return (
-        <h1>Delete user with the id: {user.id}</h1>
+        <DeleteUser user={user} id={id} />
     );
 }

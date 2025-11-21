@@ -6,14 +6,13 @@ import Link from "next/link";
 export default async function AllUsersPage({searchParams}:{searchParams: Promise<{query?: string}>}){
     //----> Check for admin privilege.
     const isAdmin = await adminUserUtil();
-    console.log("In all-users-page", isAdmin);
+
     if (!isAdmin) {
         return <h1 className="flex justify-center items-center bg-white p-4">You are not permitted to view or perform any action on this page!</h1>
     }
 
     //----> Get the search query.
     const {query} = await searchParams;
-    console.log("In all users-page, query : ", query);
 
     const users = await getAllUsers(query);
     return (
@@ -56,12 +55,7 @@ export default async function AllUsersPage({searchParams}:{searchParams: Promise
                 </tbody>
             </table>
             <div className="flex items-center justify-end my-8">
-                <Link
-                    href="/pizzas/new"
-                    className="bg-indigo-500 text-indigo-100 px-12 py-4 rounded-lg uppercase font-bold"
-                >
-                    Add Pizza
-                </Link>
+
             </div>
         </div>
     );

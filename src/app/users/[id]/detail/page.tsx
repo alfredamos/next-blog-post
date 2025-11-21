@@ -1,4 +1,6 @@
 import {getUserById} from "@/app/actions/user.action";
+import Card from "@/components/Card";
+import DetailPostCardButtons from "@/components/DetailPostCardButtons";
 
 export default async function GetUserPage({params}:{params: Promise<{id: string}>}){
     console.log("At point 1, in get user page, params: ", await params);
@@ -9,6 +11,9 @@ export default async function GetUserPage({params}:{params: Promise<{id: string}
     console.log("At point 2, in get user page, user: ", user);
 
     return (
-        <h1>Fetch user with the id: {user.id}</h1>
+        <Card name={user.name} address={""} image={user.image} path="users" >
+            <DetailPostCardButtons id={id} isAddButton={false} isEditButton={false} path="users"/>
+        </Card>
+
     );
 }

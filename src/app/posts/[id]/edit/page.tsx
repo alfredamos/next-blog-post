@@ -1,5 +1,5 @@
 import BlogPostForm from "@/app/posts/add/BlogPostForm";
-import {createPost, editPostById, getPostById} from "@/app/actions/post.action";
+import {editPostById, getPostById} from "@/app/actions/post.action";
 import {Post} from "@/validations/post.validation";
 
 export default async function EditPostByIdPage({params}:{params: Promise<{id: string}>}) {

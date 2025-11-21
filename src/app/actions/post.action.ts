@@ -6,6 +6,7 @@ import {validateWithZodSchema} from "@/validations/zodSchema.validation";
 import {postSchema} from "@/validations/post.validation";
 import {CustomError} from "@/utils/customError.util";
 import {revalidatePath} from "next/cache";
+import {redirect} from "next/navigation";
 
 export async function createPost(formData: FormData) {
     //----> Get the post payload from formData.
@@ -13,7 +14,6 @@ export async function createPost(formData: FormData) {
 
     const {title, content, imageUrl} = postPayload;
     const req = {title, content, imageUrl} as Post;
-    console.log("In create-post, req : ", req);
 
     //----> Check validation error.
     const result = validateWithZodSchema(postSchema, req)
@@ -42,7 +42,7 @@ export async function deletePostById(id:string){
 
     //----> Send back response.
     revalidatePath("/");
-
+    redirect("/posts")
 }
 
 export async function deletePostsByAuthorId(authorId:string){

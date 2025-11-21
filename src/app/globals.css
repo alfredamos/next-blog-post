@@ -17,7 +17,7 @@
 
 .modal-main {
     background: white;
-    padding: 20px;
+    padding: 1px;
     border-radius: 10px;
     max-width: 500px;
     width: 80%; /* Ensures responsiveness */

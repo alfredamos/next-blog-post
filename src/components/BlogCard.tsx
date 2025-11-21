@@ -1,4 +1,4 @@
-import React, {JSX, ReactNode} from 'react';
+import React, {ReactNode} from 'react';
 import Link from "next/link";
 import BlogPostContent from "@/components/BlogPostContent";
 
@@ -12,6 +12,7 @@ type Props = {
 }
 
 export default function BlogCard({authorName, children, id, image, title, description}:Props) {
+    console.log("In BlogCard, authorName", authorName);
     return (
         <div className="max-w-sm mx-auto mt-4 rounded-lg shadow-lg overflow-hidden bg-white">
             {/* Card Image */}
@@ -31,16 +32,16 @@ export default function BlogCard({authorName, children, id, image, title, descri
                 </h2>
 
                 {/* Card Description */}
-                <p className="text-gray-600 text-base mb-4">
+                <div className="text-gray-600 text-base mb-4">
                     {/*{description}*/}
                     <BlogPostContent content={description}/>
-                </p>
+                </div>
             </div>
 
             {/* Card Actions/Buttons */}
             <div className="px-6 pb-6 flex justify-between items-center">
 
-                <Link href="/posts" className="bg-gray-200 hover:text-gray-200 text-gray-800 hover:bg-gray-800 hover: font-semibold px-4 py-2 rounded-lg shadow-md transition duration-200">
+                <Link href="/posts" className="bg-gray-200 hover:text-gray-200 text-gray-800 hover:bg-gray-800 hover: font-semibold px-4 py-2 rounded-lg shadow-md transition duration-200 mr-4">
                     Back
                 </Link>
                 {children}

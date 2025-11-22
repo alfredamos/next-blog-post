@@ -12,7 +12,7 @@ export default async function GetPostByIdPage({params}:{params: Promise<{id: str
 
     return (
         <BlogCard authorName={author.name} id={post.id} title={post.title} description={post.content} image={""}>
-            <DetailPostCardButtons id={id} isAddButton={true} path="posts"/>
+            <DetailPostCardButtons id={id} isAddButton={true} isEditButton={true} path="posts"/>
         </BlogCard>
 
     );

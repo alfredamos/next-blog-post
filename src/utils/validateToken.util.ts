@@ -6,7 +6,7 @@ import {redirect} from "next/navigation";
 import {CustomError} from "@/utils/customError.util";
 import {Role} from "@prisma/client";
 
-export function validateUserToken(token: string): UserResponse{
+export function validateUserToken(token: string): Session{
     //----> Check for empty token.
     if(!token) {
         return USER_NOT_LOGIN;
@@ -23,7 +23,7 @@ export function validateUserToken(token: string): UserResponse{
 }
 
 function getUserCredential(tokenJwt: TokenJwt, token: string){
-    const userResponse : UserResponse = {
+    const userResponse : Session = {
         id: tokenJwt.id,
         name: tokenJwt.name,
         email: tokenJwt.email,
@@ -37,7 +37,7 @@ function getUserCredential(tokenJwt: TokenJwt, token: string){
 
 }
 
-const USER_NOT_LOGIN : UserResponse = {
+const USER_NOT_LOGIN : Session = {
     id: "",
     name: "",
     email: "",

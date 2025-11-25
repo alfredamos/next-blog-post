@@ -1,5 +1,6 @@
 import React, {ReactNode} from 'react';
 import Link from "next/link";
+import Image from "next/image";
 
 type Props = {
     children: ReactNode,
@@ -13,11 +14,17 @@ const Card = ({children, name, image, address, path}:Props) => {
     return (
         <div className="max-w-sm rounded-lg shadow-lg overflow-hidden bg-white mx-auto mt-6 w-full">
             {/* Card Image */}
-            <img
-                className="w-full h-48 object-cover"
-                src={`${image.startsWith("http") ? image : "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000"}`}
-                alt="Nike Air Max Sneakers"
-            />
+            <div className="relative w-full h-auto aspect-square object-cover object-cover object-center bg-cover">
+                <Image
+                    className="object-cover"
+                    src={`${image.startsWith("http") ? image : "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000"}`}
+                    alt="Nike Air Max Sneakers"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+
+                />
+            </div>
+
 
             {/* Card Content */}
             <div className="p-6">

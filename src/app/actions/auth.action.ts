@@ -99,16 +99,17 @@ export async function loginUser(formData: FormData){
         email: loginReq.email as string,
         password: loginReq.password as string,
     }
-
+    console.log("At point 1, login-user, loginReq", loginReq);
     //----> Check validation error.
     const response = validateWithZodSchema(loginUserSchema, req)
     if (response instanceof CustomError) {
         throw new CustomError(response.name, response.message, response.status);
     }
+    console.log("At point 2, login-user, loginReq", loginReq);
 
     //----> Login user.
      const userRes = await authModel.loginUser(req);
-
+    console.log("At point 3, login-user, loginReq", userRes);
     //----> Check for error.
      if (userRes instanceof CustomError) {
          throw new CustomError(userRes.name, userRes.message, userRes.status);
@@ -127,10 +128,11 @@ export async function logoutUser(){
         throw new CustomError(response.name, response.message, response.status);
     }
 
-    redirect("/")
+    redirect("/login")
 }
 
 export async function refreshUserTokenAction(){
+    console.log("clicked! clicked!! clicked!!!")
     //----> Refresh user token.
     const cookieStore = await cookies();
     const refreshToken = cookieStore?.get(CookieParam.refreshTokenName)?.value as string;
@@ -142,7 +144,8 @@ export async function refreshUserTokenAction(){
         throw new CustomError(response.name, response.message, response.status);
     }
 
-    redirect("/")
+    //----> Send back user response.
+    return response;
 }
 
 export async function signupUser(formData: FormData){

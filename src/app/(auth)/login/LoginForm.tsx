@@ -2,7 +2,7 @@
 
 import Form from "next/form";
 import {loginUser as loginAction} from "@/app/actions/auth.action";
-import {useRouter} from "next/navigation";
+import {redirect, useRouter} from "next/navigation";
 import {useAuthContext} from "@/hooks/useAuthContext";
 import CancelButton from "@/utils/CancelButton";
 import {useLocalStorage} from "@/hooks/useLocalStorage";
@@ -11,7 +11,7 @@ import {LocalStorageParam} from "@/utils/LocalStorageParam";
 export default function LoginForm() {
     const router = useRouter();
     const {setUserResponse} = useAuthContext()
-    const {setLocalStorage} = useLocalStorage<UserResponse>()
+    const {setLocalStorage} = useLocalStorage<Session>()
 
     const loginSubmitHandler = async (formData: FormData) => {
         try {
@@ -19,12 +19,12 @@ export default function LoginForm() {
 
             //----> Set both the auth-context and local-storage.
             setUserResponse(response);
-            setLocalStorage(LocalStorageParam.userResp, response as UserResponse)
+            setLocalStorage(LocalStorageParam.userResp, response as Session)
 
         } catch (error) {
             console.error(error); //----> Show toast for successful login.
         }finally{
-            router.push("/");
+            redirect("/");
         }
     }
     return (

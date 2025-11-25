@@ -18,7 +18,7 @@ export default function BlogPostContent({content}: Prop): JSX.Element {
     };
 
     return (
-        <div className="px-4 py-2 border-b border-blue-100">
+        <div className="py-2 border-b border-blue-100">
             <p className="break-words">
                 {displayedContent}
             </p>

@@ -3,6 +3,12 @@
 import { useState, useRef, useEffect, ReactNode } from 'react';
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
+import Form from "next/form";
+import {useAuthContext} from "@/hooks/useAuthContext";
+import {useLocalStorage} from "@/hooks/useLocalStorage";
+import {refreshUserTokenAction} from "@/app/actions/auth.action";
+import {LocalStorageParam} from "@/utils/LocalStorageParam";
+import {redirect} from "next/navigation";
 
 
 interface DropdownItemProps {
@@ -10,16 +16,52 @@ interface DropdownItemProps {
     children: ReactNode;
 }
 
-const DropdownItem = ({ href, children}: DropdownItemProps) => (
-    <Link
-        href={href}
-        className="block px-4 py-2 font-medium text-sm text-gray-700 hover:bg-gray-100"
-    >
-        {children}
-    </Link>
+const DropdownItem = ({ href, children}: DropdownItemProps) => {
+    const {setUserResponse} = useAuthContext()
+    const {setLocalStorage} = useLocalStorage<Session>()
+
+    const isNotRefresh = href !== "/refresh";
+
+    const refreshTokenOfUserAction = async () => {
+        try {
+        const response = await refreshUserTokenAction();
+
+        //----> Set both the auth-context and local-storage.
+        setUserResponse(response);
+        setLocalStorage(LocalStorageParam.userResp, response as Session);
+
+        } catch (error) {
+            console.error(error); //----> Show toast for successful login.
+        }finally{
+            redirect("/");
+        }
+    }
+
+    return(
+        <>
+            {isNotRefresh ? ( <Link
+                href={href}
+                className="block px-4 py-2 font-medium text-sm text-gray-700 hover:bg-gray-100"
+            >
+                {children}
+            </Link>
+                ) :
+                (
+                    <Form action={refreshTokenOfUserAction}>
+                        <button type="submit" className="block px-4 py-2 font-medium text-sm text-gray-700 hover:bg-gray-100">Refresh</button>
+                    </Form>)
+            }
+        </>
+       )
 
 
-);
+}
+
+
+
+
+
+//);
 
 interface DropdownProps {
     title: string;

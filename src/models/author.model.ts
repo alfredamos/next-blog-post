@@ -66,9 +66,9 @@ class AuthorModel{
         }
 
         //----> Check for ownership or admin.
-        if (!await ownerCheckOrAdmin(author.userId)){
-            return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
-        }
+        // if (!await ownerCheckOrAdmin(author.userId)){
+        //     return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+        // }
 
         //----> Send back response.
         return author;

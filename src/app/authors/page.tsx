@@ -1,6 +1,6 @@
 import {getAllAuthors} from "@/app/actions/author.action";
 import {adminUserUtil} from "@/utils/adminUser.util";
-//import Image from "next/image";
+import Image from "next/image";
 import Link from "next/link";
 //import {redirect} from "next/navigation";
 import SearchAuthors from "@/components/SearchAuthors";
@@ -10,7 +10,7 @@ export default async function GetAllAuthorsPage({searchParams}:{searchParams: Pr
     const isAdmin = await adminUserUtil();
     console.log("In all-authors-page", isAdmin);
     if (!isAdmin) {
-        return <h1 className="flex justify-center items-center bg-white p-4">You are not permitted to view or perform any action on this page!</h1>
+        return <h1 className="h-screen flex justify-center items-center font-bold p-6 bg-red-200 ring-1 ring-red-200 shadow-lg">You are not permitted to view or perform any action on this page!</h1>
     }
 
     //----> Get the search params, if there are any.
@@ -25,7 +25,7 @@ export default async function GetAllAuthorsPage({searchParams}:{searchParams: Pr
             <table className="table table-zebra border-1 border-gray-200 p-3">
                 <thead className="text-gray-200 text-xl bg-gray-500">
                 <tr className="">
-                    {/*<th>Image</th>*/}
+                    <th>Image</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
@@ -38,16 +38,16 @@ export default async function GetAllAuthorsPage({searchParams}:{searchParams: Pr
                 {authors?.map((author) => {
                     return (
                         <tr key={author.id} className="text-base text-black">
-                            {/*<td>*/}
-                            {/*    <Image*/}
-                            {/*        src={author.image}*/}
-                            {/*        alt={author.name}*/}
-                            {/*        width={80}*/}
-                            {/*        height={80}*/}
-                            {/*        className="aspect-square object-cover w-20 h-auto"*/}
-                            {/*        priority*/}
-                            {/*    />*/}
-                            {/*</td>*/}
+                            <td>
+                                <Image
+                                    src={author.image}
+                                    alt={author.name}
+                                    width={80}
+                                    height={80}
+                                    className="aspect-square object-cover w-30 h-auto"
+                                    priority
+                                />
+                            </td>
                             <td className="px-4">{author.name}</td>
                             <td className="px-4">{author.email}</td>
                             <td className="px-4">{author.phone}</td>

@@ -10,11 +10,12 @@ import {LocalStorageParam} from "@/utils/LocalStorageParam";
 import {logoutUser} from "@/app/actions/auth.action";
 import {useState} from "react";
 import {useAuthContext} from "@/hooks/useAuthContext";
+import {redirect} from "next/navigation";
 
 
 export default function AuthAndAdminMenu() {
     const [isOpen, setIsOpen] = useState(false);
-    const {getLocalStorage, removeLocalStorage} = useLocalStorage<UserResponse>();
+    const {getLocalStorage, removeLocalStorage} = useLocalStorage<Session>();
     const {userResponse} = useAuthContext();
 
     const userResp = userResponse ?? getLocalStorage(LocalStorageParam.userResp);

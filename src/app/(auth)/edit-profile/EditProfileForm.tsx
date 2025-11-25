@@ -48,6 +48,7 @@ export default async function EditProfileForm({ author }: Props) {
                     id="email"
                     name="email"
                     type="email"
+                    disabled
                     defaultValue={author?.email}
                     className="border-solid border-2 border-gray-300 focus:border-indigo-600 focus:outline-none bg-slate-200 w-full p-2 rounded-lg text-black"
                 />

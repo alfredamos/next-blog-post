@@ -260,8 +260,8 @@ class AuthModel{
         await this.setCookie(CookieParam.refreshTokenName, refreshToken, CookieParam.refreshTokenPath, CookieParam.refreshTokenExpireIn);
 
         //----> Set the cookie-session.
-        const userResponse: UserResponse = {id: user.id, name: user.name, email: user.email, role: user.role, isLoggedIn: true, isAdmin: user.role === Role.Admin, accessToken}
-        await this.setCookie(CookieParam.sessionTokenName, JSON.stringify(userResponse), CookieParam.sessionTokenPath, CookieParam.sessionTokenExpireIn)
+        const session: Session = {id: user.id, name: user.name, email: user.email, role: user.role, isLoggedIn: true, isAdmin: user.role === Role.Admin, accessToken}
+        await this.setCookie(CookieParam.sessionTokenName, JSON.stringify(session), CookieParam.sessionTokenPath, CookieParam.sessionTokenExpireIn)
 
 
         //----> Make token object and store it in token db.
@@ -269,7 +269,7 @@ class AuthModel{
         await tokenModel.createToken(tokenObject as Token)
 
         //----> Send back access token.
-        return userResponse;
+        return session;
     }
 
     private setCookie = async (cookieName: string, cookieValue: string, cookiePath: string, maxAge: number) => {

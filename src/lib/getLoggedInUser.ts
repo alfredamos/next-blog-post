@@ -11,6 +11,6 @@ export async function getLoggedInUserInfo(){
     }
 
     //----> Parse user info.
-    return JSON.parse(session) as UserResponse;
+    return JSON.parse(session) as Session;
 
 }

@@ -1,19 +1,21 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import {validateCredential} from "@/utils/validateCredential.util";
 import {isPublicRoute} from "@/utils/publicRoute.util";
+import {getSession} from "@/lib/getSession";
+import {validateCredential} from "@/utils/validateCredential.util";
 
 export async function proxy(request: NextRequest) {
     //----> Exclude public routes.
     if (isPublicRoute(request?.nextUrl?.pathname)) {
+        console.log("In proxy, url : ", `${request?.nextUrl?.pathname}`);
         return NextResponse.next();
     }
 
     //----> Authenticate user.
-    const userResponse = await validateCredential();
-
+    const session = await validateCredential();
+    console.log("In proxy, session: ", session);
     //----> Check for unauthenticated user.
-    if (!userResponse?.isLoggedIn) {
+    if (!session?.isLoggedIn) {
         const loginUrl = new URL('/login', request.url);
         return NextResponse.redirect(loginUrl);
     }

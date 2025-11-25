@@ -2,13 +2,14 @@ import {getAllUsers} from "@/app/actions/user.action";
 import {adminUserUtil} from "@/utils/adminUser.util";
 import SearchAuthors from "@/components/SearchAuthors";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function AllUsersPage({searchParams}:{searchParams: Promise<{query?: string}>}){
     //----> Check for admin privilege.
     const isAdmin = await adminUserUtil();
 
     if (!isAdmin) {
-        return <h1 className="flex justify-center items-center bg-white p-4">You are not permitted to view or perform any action on this page!</h1>
+        return <h1 className="h-screen flex justify-center items-center font-bold p-6 bg-red-200 ring-1 ring-red-200 shadow-lg">You are not permitted to view or perform any action on this page!</h1>
     }
 
     //----> Get the search query.
@@ -21,7 +22,7 @@ export default async function AllUsersPage({searchParams}:{searchParams: Promise
             <table className="table table-zebra border-1 border-gray-200 p-3 mx-auto">
                 <thead className="text-gray-200 text-xl bg-gray-500">
                 <tr className="">
-                    {/*<th>Image</th>*/}
+                    <th>Image</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Actions</th>
@@ -31,16 +32,16 @@ export default async function AllUsersPage({searchParams}:{searchParams: Promise
                 {users?.map((user) => {
                     return (
                         <tr key={user.id} className="text-base text-black">
-                            {/*<td>*/}
-                            {/*    <Image*/}
-                            {/*        src={author.image}*/}
-                            {/*        alt={author.name}*/}
-                            {/*        width={80}*/}
-                            {/*        height={80}*/}
-                            {/*        className="aspect-square object-cover w-20 h-auto"*/}
-                            {/*        priority*/}
-                            {/*    />*/}
-                            {/*</td>*/}
+                            <td>
+                                <Image
+                                    src={user.image}
+                                    alt={user.name}
+                                    width={80}
+                                    height={80}
+                                    className="aspect-square object-cover w-30 h-auto"
+                                    priority
+                                />
+                            </td>
                             <td className="px-4">{user.name}</td>
                             <td className="px-4">{user.email}</td>
                             <td className="flex justify-between items-center">

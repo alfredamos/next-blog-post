@@ -12,7 +12,7 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
 
     useEffect(() => {
         // Log the error to an error reporting service
-        console.error(error);
+        //console.error(error);
         // Simulate a loading delay before showing the error message
         const timer = setTimeout(() => {
             setIsLoading(false);
@@ -25,7 +25,7 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
             {isLoading ? (
                 <div className="flex items-center space-x-2">
                     <div className="w-8 h-8 border-4 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
-                    <p className="text-lg text-gray-700">Loading error details...</p>
+                    <p className="text-lg text-gray-700">{error.message}</p>
                 </div>
             ) : (
                 <div className="text-center bg-white p-8 rounded-lg shadow-md max-w-md">

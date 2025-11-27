@@ -1,11 +1,17 @@
 import Form from "next/form";
 import {signupUser as signupAction} from "@/app/actions/auth.action";
 import CancelButton from "@/utils/CancelButton";
+import {redirect} from "next/navigation";
 
 export default function SignupForm() {
+    const signupUserAction = async (formData: FormData) => {
+        await signupAction(formData);
+        redirect("/")
+    }
+
     return (
         <Form
-            action={signupAction}
+            action={signupUserAction}
             className="bg-white text-slate-800 max-w-lg flex flex-col justify-center items-center mx-auto rounded-xl shadow-2xl py-10 mt-10"
         >
             <h4 className="font-bold text-slate-800 text-2xl mb-6">Signup Form</h4>

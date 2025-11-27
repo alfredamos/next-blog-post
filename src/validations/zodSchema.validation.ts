@@ -5,15 +5,16 @@ import {extractZodErrorMessages} from "@/validations/extractZodErrorMessages.uti
 
 export function validateWithZodSchema<T>(
     schema: ZodSchema<T>,
-    data: unknown
+    values: unknown
 ){
-    const result = schema.safeParse(data);
+    const result = schema.safeParse(values);
 
     //----> Check for error
     if (!result.success) {
         //----> Extract error message.
         const errors = extractZodErrorMessages(result.error);
-        return new CustomError("Validation Error", errors.join(", "), StatusCodes.BAD_REQUEST);
+        throw new CustomError("Validation Error", errors.join(", "), StatusCodes.BAD_REQUEST);
     }
-    return result;
+    const {data} = result;
+    return {data};
 }

@@ -2,13 +2,23 @@ import React from "react";
 import {Post} from ".prisma/client";
 import Image from "next/image";
 import {getAuthorId} from "@/app/actions/author.action";
+import {Author} from "@prisma/client";
+import {CustomError} from "@/utils/customError.util";
 
 type Props = {
     post: Post;
 }
 
 export default async function AuthorAvatar({post}: Props) {
-    const author = await getAuthorId(post.authorId as string);
+    console.log("In author-avatar, post : ", post);
+    const {author: currentAuthor, error} = await getAuthorId(post.authorId as string);
+
+    //----> Check for error.
+    if (error){
+        return <div className="h-dvh flex justify-center items-center"><h1 className="font-bold p-10 bg-red-200 ring-1 ring-red-200 rounded-lg shadow-lg">{(error as CustomError)?.message}</h1></div>
+    }
+
+    const author = currentAuthor as Author;
     const authorName = author.name;
     const image = author.image;
     return (

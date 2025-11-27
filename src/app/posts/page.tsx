@@ -3,12 +3,21 @@ import Link from "next/link";
 import BlogPostContent from "@/components/BlogPostContent";
 import React from "react";
 import AuthorAvatar from "@/app/posts/AuthorAvatar";
+import {CustomError} from "@/utils/customError.util";
 
 
 
 
 export default async function GetAllPostPage() {
-    const allPosts = await getAllPosts();
+    const {posts, error} = await getAllPosts();
+
+    //----> Check for error.
+    if (error){
+        return <div className="h-dvh flex justify-center items-center"><h1 className="font-bold p-10 bg-red-200 ring-1 ring-red-200 rounded-lg shadow-lg">{(error as CustomError)?.message}</h1></div>
+    }
+
+    const allPosts = posts ? posts : [];
+
     console.log("In get-all-post-page, posts : ", allPosts);
     return (
         <div className="container max-w-4xl mx-auto p-4">
@@ -20,6 +29,7 @@ export default async function GetAllPostPage() {
             <div className="grid grid-cols-1 auto-rows-fr md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {allPosts.map((post) => (
                     <div key={post.id} className="bg-white p-4 rounded-lg shadow-md">
+
                         <AuthorAvatar post={post} />
                         {/*<h3 className="text-xl font-semibold mb-2">{post.title}</h3>*/}
                         <div className="text-gray-700 mb-4"><BlogPostContent content={post.content}/></div>

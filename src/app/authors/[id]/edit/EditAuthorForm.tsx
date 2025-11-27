@@ -2,6 +2,8 @@ import Form from "next/form";
 import CancelButton from "@/utils/CancelButton";
 import {Author} from "@prisma/client";
 import {editAuthorId} from "@/app/actions/author.action";
+import {redirect} from "next/navigation";
+import {revalidatePath} from "next/cache";
 
 type Props = {
     author: Author;
@@ -19,9 +21,15 @@ export default async function EditAuthorForm({ author}: Props) {
         return `${year}-${month}-${day}`;
     }
 
+    const editAuthorAction = async (formData: FormData) => {
+        await editAuthorId(formData);
+        revalidatePath("/authors");
+        return redirect("/authors");
+    }
+
     return (
         <Form
-            action={editAuthorId}
+            action={editAuthorAction}
             className="bg-white text-slate-800 max-w-lg flex flex-col justify-center items-center mx-auto rounded-xl shadow-2xl py-10 mt-10"
         >
             <h4 className="font-bold text-slate-800 text-2xl mb-6">Edit User Profile Form</h4>

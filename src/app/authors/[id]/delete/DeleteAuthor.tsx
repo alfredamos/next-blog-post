@@ -4,7 +4,7 @@ import Modal from "@/components/Modal";
 import {useState} from "react";
 import Form from "next/form";
 import Link from "next/link";
-import {useRouter} from "next/navigation";
+import {redirect, useRouter } from "next/navigation";
 import {Author} from "@prisma/client";
 import Card from "@/components/Card";
 import {deleteAuthorId} from "@/app/actions/author.action";
@@ -16,18 +16,19 @@ type Prop = {
 
 export default function DeleteAuthor({author, id}: Prop) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const router = useRouter();
 
     const handleOpenModal = () => setIsModalOpen(true);
     const handleCloseModal = () => setIsModalOpen(false);
-
-    const router = useRouter();
 
     const deleteAuthorAction = async () => {
         await deleteAuthorId(id)
         handleCloseModal();
 
-        router.push("/");
+        router.refresh();
+        return redirect("/authors");
     }
+
 
     return (
         <div className="text-white flex justify-center items-center"> {/* Ensure your root element has an ID for accessibility binding */}

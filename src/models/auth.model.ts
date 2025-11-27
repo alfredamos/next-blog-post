@@ -21,20 +21,15 @@ class AuthModel{
 
         //----> Check for password match.
         if (!this.checkForPasswordMatch(confirmPassword, newPassword)){
-            return new CustomError("Bad request", "Passwords don't match!", StatusCodes.BAD_REQUEST);
+            throw new CustomError("Bad request", "Passwords don't match!", StatusCodes.BAD_REQUEST);
         }
 
         //----> Check for existence of user.
         const user = await this.getUserByEmail(email);
 
-        //----> Check for error
-        if (user instanceof CustomError) {
-            return user;
-        }
-
         //----> Check for valid password.
         if (! await this.checkForValidPassword(password, user.password)){
-            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            throw new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Hash the new password.
@@ -55,14 +50,9 @@ class AuthModel{
         //----> Check for existence of user.
         const user = await this.getUserByEmail(email);
 
-        //----> Check for error
-        if (user instanceof CustomError) {
-            return user;
-        }
-
         //----> Check for valid password.
         if (! await this.checkForValidPassword(password, user.password)){
-            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            throw new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Update the user.
@@ -72,11 +62,6 @@ class AuthModel{
 
         //----> Update author.
         const author = await this.getAuthorByEmail(email);
-
-        //----> Check for error
-        if (author instanceof CustomError) {
-            return author;
-        }
 
         const updatedAuthor = {...fromEditProfileToAuthorUtil(req, user.id), id: author.id};
         await prisma.author.update({where: {email}, data: {...updatedAuthor}});
@@ -89,11 +74,6 @@ class AuthModel{
         //----> Fetch the current user from db.
         const user = await this.getUserByEmail(email);
 
-        //----> Check for error
-        if (user instanceof CustomError) {
-            return user;
-        }
-
         return toUserDto(user);
     }
 
@@ -105,14 +85,9 @@ class AuthModel{
         //----> Check for existence of user.
         const user = await this.getUserByEmail(email);
 
-        //----> Check for error
-        if (user instanceof CustomError) {
-            return user;
-        }
-
         //----> Check for valid password.
         if (! await this.checkForValidPassword(password, user.password)){
-            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            throw new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Generate access and refresh tokens and store them in cookies and send back access token.
@@ -124,18 +99,8 @@ class AuthModel{
         const cookieStore = await cookies();
         const accessToken = cookieStore.get(CookieParam.accessTokenName)?.value as string;
 
-        //----> Check for null access token.
-        if (!accessToken) {
-            await this.deleteAllCookies();
-            return new CustomError("Null Token", "You have already logged out!", StatusCodes.UNAUTHORIZED);
-        }
-
         //----> Get the valid token object.
         const tokenObject = await tokenModel.findTokenByAccessToken(accessToken);
-
-        if (!tokenObject ||(tokenObject instanceof CustomError)){
-            return new CustomError("Token is empty", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
-        }
 
         //----> Delete access-token, refresh-token and session-token.
         await this.deleteCookie(CookieParam.accessTokenName);
@@ -150,18 +115,8 @@ class AuthModel{
     }
 
     refreshUserToken = async (refreshToken: string) => {
-        //----> Check for null refresh token.
-        if (!refreshToken) {
-            return  new CustomError("No refreshToken", "Your refresh token has expired", StatusCodes.UNAUTHORIZED);
-        }
-
         //----> Validate refresh token.
         const userToken = validateUserToken(refreshToken as string);
-
-        //----> Check for null userToken
-        if (!userToken) {
-            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
-        }
 
         //----> Generate access and refresh tokens and store them in cookies and send back access token.
         return await this.generateAccessAndRefreshTokensByUser(userToken as TokenJwt);
@@ -174,13 +129,13 @@ class AuthModel{
 
         //----> Check for password match.
         if (!this.checkForPasswordMatch(password, confirmPassword)){
-            return new CustomError("UnAuthorized", "Passwords don't match!", StatusCodes.BAD_REQUEST);
+            throw new CustomError("UnAuthorized", "Passwords don't match!", StatusCodes.BAD_REQUEST);
         }
 
         //----> Check for existence of user.
         const user = await prisma.user.findUnique({where: {email}})
         if (user){
-            return new CustomError("UnAuthorized", "User already exist!", StatusCodes.UNAUTHORIZED);
+            throw new CustomError("UnAuthorized", "User already exist!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Hash password.
@@ -212,7 +167,7 @@ class AuthModel{
 
         //----> Check for null user.
         if(!user){
-            return new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+            throw new CustomError("UnAuthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
         }
 
         //----> Send back result.
@@ -225,7 +180,7 @@ class AuthModel{
 
         //----> Check for null author.
         if(!author){
-            return new CustomError("Not found", "Author is not found in db!", StatusCodes.NOT_FOUND);
+            throw new CustomError("Not found", "Author is not found in db!", StatusCodes.NOT_FOUND);
         }
 
         //----> Send back result.

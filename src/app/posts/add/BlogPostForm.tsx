@@ -15,6 +15,7 @@ export default function BlogPostForm({post, postAction}: Prop) {
     const postAddAction = async (formData: FormData) => {
         postAction(formData);
 
+        router.refresh();
         router.push("/");
     }
 

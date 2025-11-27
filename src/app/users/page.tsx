@@ -3,19 +3,25 @@ import {adminUserUtil} from "@/utils/adminUser.util";
 import SearchAuthors from "@/components/SearchAuthors";
 import Link from "next/link";
 import Image from "next/image";
+import {CustomError} from "@/utils/customError.util";
 
 export default async function AllUsersPage({searchParams}:{searchParams: Promise<{query?: string}>}){
     //----> Check for admin privilege.
     const isAdmin = await adminUserUtil();
 
     if (!isAdmin) {
-        return <h1 className="h-screen flex justify-center items-center font-bold p-6 bg-red-200 ring-1 ring-red-200 shadow-lg">You are not permitted to view or perform any action on this page!</h1>
+        return <div className="h-dvh flex justify-center items-center"><h1 className="font-bold p-10 bg-red-200 ring-1 ring-red-200 rounded-lg shadow-lg">You are not permitted to view or perform any action on this page!</h1></div>
     }
 
     //----> Get the search query.
     const {query} = await searchParams;
 
-    const users = await getAllUsers(query);
+    const{users, error} = await getAllUsers(query);
+
+    if (error){
+        return <div className="h-dvh flex justify-center items-center"><h1 className="font-bold p-10 bg-red-200 ring-1 ring-red-200 rounded-lg shadow-lg">{(error as CustomError)?.message}</h1></div>
+    }
+
     return (
         <div className="overflow-x-auto bg-white m-6 shadow-inner rounded mx-4 p-3">
             <SearchAuthors path="/users"/>

@@ -10,13 +10,16 @@ export default async function GetAllAuthorsPage({searchParams}:{searchParams: Pr
     const isAdmin = await adminUserUtil();
     console.log("In all-authors-page", isAdmin);
     if (!isAdmin) {
-        return <h1 className="h-screen flex justify-center items-center font-bold p-6 bg-red-200 ring-1 ring-red-200 shadow-lg">You are not permitted to view or perform any action on this page!</h1>
+        return <div className="h-dvh flex justify-center items-center"><h1 className="font-bold p-10 bg-red-200 ring-1 ring-red-200 rounded-lg shadow-lg">You do not have permission to view or perform any action on this page!</h1></div>
     }
 
     //----> Get the search params, if there are any.
     const {query} = await searchParams;
 
-    const authors = await getAllAuthors(query);
+    const {authors, error} = await getAllAuthors(query);
+
+    if (error) throw error
+
 
 
     return (

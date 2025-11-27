@@ -6,7 +6,7 @@ export const changeUserPasswordSchema = z.object({
     password: z.string().min(1, { message: "Password cannot be empty." }),
     newPassword: z.string().min(1, { message: "NewPassword cannot be empty." }),
     confirmPassword: z.string().min(1, { message: "ConfirmPassword cannot be empty." })
-}).refine((values) => values.newPassword.normalize() === values.newPassword.normalize(),
+}).refine((values) => values.confirmPassword.normalize() === values.newPassword.normalize(),
     {
         message: "Passwords do not match",
         path: ["confirmPassword"], // Associates the error with the confirmPassword field

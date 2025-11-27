@@ -13,7 +13,6 @@ import {getLoggedInUserInfo} from "@/lib/getLoggedInUser";
 import {cookies} from "next/headers";
 import {CookieParam} from "@/utils/cookieParam.util";
 import {validateWithZodSchema} from "@/validations/zodSchema.validation";
-import {CustomError} from "@/utils/customError.util";
 
 export async function changeUserPassword(formData: FormData) {
     //----> Extract the parameters from formData.
@@ -25,21 +24,19 @@ export async function changeUserPassword(formData: FormData) {
         newPassword: cupReq.password,
     }
 
+    try{
+        validateWithZodSchema(changeUserPasswordSchema, req)
+
+        //----> Change the user password in the db.
+        await authModel.changeUserPassword(req);
+        return redirect("/");
+    }catch(err){
+        return err
+    }
     //----> Check validation error.
-    const result = validateWithZodSchema(changeUserPasswordSchema, req)
-    if (result instanceof CustomError) {
-        throw new CustomError(result.name, result.message, result.status);
-    }
 
-    //----> Change the user password in the db.
-    const response = await authModel.changeUserPassword(req);
 
-    //----> Check for response error.
-    if (response instanceof CustomError) {
-        throw new CustomError(response.name, response.message, response.status);
-    }
 
-    return redirect("/");
 }
 
 export async function editUserProfile(formData: FormData){
@@ -59,36 +56,40 @@ export async function editUserProfile(formData: FormData){
         gender: editProfileOfUser.gender as  'Male' | 'Female',
     }
 
-    //----> Check validation error.
-    const result = validateWithZodSchema(editProfileUserSchema, req)
-    if (result instanceof CustomError) {
-        throw new CustomError(result.name, result.message, result.status);
+    try {
+        //----> Check validation error.
+        validateWithZodSchema(editProfileUserSchema, req)
+
+        //----> Refresh user token.
+        await authModel.editUserProfile(req);
+
+        return redirect("/");
+    }catch(err){
+        return err
     }
-
-    //----> Refresh user token.
-    const response = await authModel.editUserProfile(req);
-
-    //----> Check for response error.
-    if (response instanceof CustomError) {
-        throw new CustomError(response.name, response.message, response.status);
-    }
-
-    return redirect("/");
 }
 
 
 export async function getCurrentUser(){
     const userResponse = await getLoggedInUserInfo()
     //----> Get current user from db and send back response.
-    const response = await authModel.getCurrentUser(userResponse.email);
+    try{
+        const response = await authModel.getCurrentUser(userResponse.email);
 
-    //----> Check for error.
-    if (response instanceof CustomError) {
-        throw new CustomError(response.name, response.message, response.status);
+        //----> Send back response
+        return {
+            user: response,
+            error: null,
+        };
+    }catch(error){
+        return {
+            user: null,
+            error: error
+        }
     }
 
-    //----> Send back response
-    return response;
+
+
 
 }
 
@@ -100,33 +101,34 @@ export async function loginUser(formData: FormData){
         password: loginReq.password as string,
     }
     console.log("At point 1, login-user, loginReq", loginReq);
-    //----> Check validation error.
-    const response = validateWithZodSchema(loginUserSchema, req)
-    if (response instanceof CustomError) {
-        throw new CustomError(response.name, response.message, response.status);
+
+    try {
+        //----> Check validation error.
+        validateWithZodSchema(loginUserSchema, req)
+
+        console.log("At point 2, login-user, loginReq", loginReq);
+
+
+        //----> Login user.
+        const userRes = await authModel.loginUser(req);
+        console.log("At point 3, login-user, loginReq", userRes);
+
+        //----> Send back user response.
+        return {
+            user: userRes,
+            error: null,
+        };
+    }catch(error){
+        return {
+            user: null,
+            error: error
+        }
     }
-    console.log("At point 2, login-user, loginReq", loginReq);
-
-    //----> Login user.
-     const userRes = await authModel.loginUser(req);
-    console.log("At point 3, login-user, loginReq", userRes);
-    //----> Check for error.
-     if (userRes instanceof CustomError) {
-         throw new CustomError(userRes.name, userRes.message, userRes.status);
-     }
-
-     //----> Send back user response.
-     return userRes;
 }
 
 export async function logoutUser(){
     //----> Logout user.
-    const response = await authModel.logoutUser();
-
-    //----> Check for error.
-    if (response instanceof CustomError) {
-        throw new CustomError(response.name, response.message, response.status);
-    }
+    await authModel.logoutUser();
 
     redirect("/login")
 }
@@ -134,18 +136,25 @@ export async function logoutUser(){
 export async function refreshUserTokenAction(){
     console.log("clicked! clicked!! clicked!!!")
     //----> Refresh user token.
-    const cookieStore = await cookies();
-    const refreshToken = cookieStore?.get(CookieParam.refreshTokenName)?.value as string;
+    try{
+        const cookieStore = await cookies();
+        const refreshToken = cookieStore?.get(CookieParam.refreshTokenName)?.value as string;
 
-    const response = await authModel.refreshUserToken(refreshToken);
 
-    //----> Check for error.
-    if (response instanceof CustomError) {
-        throw new CustomError(response.name, response.message, response.status);
+        const response = await authModel.refreshUserToken(refreshToken);
+
+        //----> Send back user response.
+        return {
+            session: response,
+        };
+    }catch(error){
+        console.error(error);
+        return {
+
+            session: null,
+        }
     }
 
-    //----> Send back user response.
-    return response;
 }
 
 export async function signupUser(formData: FormData){
@@ -164,19 +173,14 @@ export async function signupUser(formData: FormData){
         gender: signupReq.gender as  'Male' | 'Female',
     }
 
-    //----> Check validation error.
-    const result = validateWithZodSchema(signupUserSchema, req)
-    if (result instanceof CustomError) {
-        throw new CustomError(result.name, result.message, result.status);
+    try {
+        //----> Check validation error.
+        validateWithZodSchema(signupUserSchema, req)
+
+        //----> Refresh user token.
+        await authModel.signupUser(req);
+        redirect("/")
+    }catch(error){
+        return error
     }
-
-    //----> Refresh user token.
-    const response = await authModel.signupUser(req);
-
-    //----> Check for error.
-    if (response instanceof CustomError) {
-        throw new CustomError(response.name, response.message, response.status);
-    }
-
-    redirect("/")
 }

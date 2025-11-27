@@ -11,14 +11,8 @@ class PostModel{
         //----> Get the current user info.
         const userAuth = await getLoggedInUserInfo();
 
-        console.log("In create-post, post : ", postToCreate);
-        console.log("In create-post, userAuth : ", userAuth);
-
         //----> Get the author associated with user.
         const author = await this.getOneAuthor(userAuth.id)
-        if (!author) {
-            return new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
-        }
 
         //----> Insert the new post in the db.
         return  prisma.post.create({data: {...postToCreate, authorId: author.id}});
@@ -27,17 +21,12 @@ class PostModel{
     async deletePostById(id:string){
         //----> Fetch the post with given id.
         const post = await this.getOnePost(id);
-        console.log("In delete-post-by-id, post : ", post);
-        if (!post) {
-            return new CustomError("Not found", "Post is not foud in db!", StatusCodes.NOT_FOUND);
-        }
 
-        //----> Check for ownership or admin.
-        const author = await prisma.author.findUnique({where:{id: post.authorId as string}});
+        //----> Check for ownership or admin privilege.
+        const author = await this.getOneAuthor(id);
         console.log("In delete-post-by-id, author : ", author);
-        if (!author) {
-            return new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
-        }
+
+        //----> Check for ownership and admin privilege.
         if (!await ownerCheckOrAdmin(author.userId)){
             throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
         }
@@ -51,13 +40,11 @@ class PostModel{
 
     async deletePostByAuthorId(authorId:string){
         //----> Check for ownership or admin.
-        const author = await prisma.author.findUnique({where:{id: authorId}});
-        if (!author) {
-            return new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
-        }
+        const author = await this.getOneAuthor(authorId);
 
+        //----> Check for ownership and admin privilege.
         if (!await ownerCheckOrAdmin(author.userId)){
-            return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+            throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
         }
 
         //----> Fetch all posts associated with the given authorId.
@@ -84,17 +71,13 @@ class PostModel{
     async editPostById(id:string, postToEdit:Post){
         //----> Fetch the post with given id.
         const post = await this.getOnePost(id);
-        if (!post) {
-            return new CustomError("Not found", "Post is not foud in db!", StatusCodes.NOT_FOUND);
-        }
+
+        //----> Fetch the author associated with this post
+        const author = await this.getOneAuthor(post.authorId as string);
 
         //----> Check for ownership or admin.
-        const author = await prisma.author.findUnique({where:{id: post.authorId as string}});
-        if (!author) {
-            return new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
-        }
         if (!await ownerCheckOrAdmin(author.userId)){
-            return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+            throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
         }
 
         //----> Edit the post with the given id.
@@ -107,18 +90,6 @@ class PostModel{
     async getPostById(id:string){
         //----> Fetch the post with given id.
         const post = await  this.getOnePost(id);
-        if (!post) {
-            return new CustomError("Not found", "Post is not foud in db!", StatusCodes.NOT_FOUND);
-        }
-
-        //----> Check for ownership or admin.
-        const author = await prisma.author.findUnique({where:{id: post.authorId as string}});
-        if (!author) {
-            return new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
-        }
-        if (!await ownerCheckOrAdmin(author.userId)){
-            return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
-        }
 
         //----> Send back response.
         return post
@@ -131,10 +102,9 @@ class PostModel{
 
     async getPostsByAuthorId(authorId:string){
         //----> Check for ownership or admin.
-        const author = await prisma.author.findUnique({where:{id: authorId}});
-        if (!author) {
-            return new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
-        }
+        const author = await this.getOneAuthor(authorId);
+
+        //----> Check for ownership or admin privilege.
         await ownerCheckOrAdmin(author.userId);
 
         //----> Fetch all posts.
@@ -143,12 +113,26 @@ class PostModel{
 
     private getOneAuthor = async (userId: string) =>{
         //----> Fetch the author with the given id from db.
-        return prisma.author.findUnique({where: {userId}});
+        const author = await prisma.author.findUnique({where: {userId}});
+
+        //----> Check for error.
+        if (!author) {
+            throw new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
+        }
+
+        return author;
     }
 
     private getOnePost = async (id: string)=>{
         //----> Fetch the post with the given id from db.
-        return prisma.post.findUnique({where: {id}});
+        const post = await prisma.post.findUnique({where: {id}});
+
+        //----> Check for error.
+        if (!post) {
+            throw new CustomError("Not found", "Post is not foud in db!", StatusCodes.NOT_FOUND);
+        }
+
+        return post;
 
 
     }

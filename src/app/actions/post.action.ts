@@ -4,9 +4,6 @@ import {Post} from ".prisma/client";
 import {postModel} from "@/models/post.model";
 import {validateWithZodSchema} from "@/validations/zodSchema.validation";
 import {postSchema} from "@/validations/post.validation";
-import {CustomError} from "@/utils/customError.util";
-import {revalidatePath} from "next/cache";
-import {redirect} from "next/navigation";
 
 export async function createPost(formData: FormData) {
     //----> Get the post payload from formData.
@@ -15,46 +12,58 @@ export async function createPost(formData: FormData) {
     const {title, content, imageUrl} = postPayload;
     const req = {title, content, imageUrl} as Post;
 
-    //----> Check validation error.
-    const result = validateWithZodSchema(postSchema, req)
-    if (result instanceof CustomError) {
-        throw new CustomError(result.name, result.message, result.status);
-    }
-    //----> Insert new post into db.
-    const response = await postModel.createPost(req);
+    try {
+        //----> Check validation error.
+        validateWithZodSchema(postSchema, req)
 
-    if (response instanceof CustomError) {
-        throw new CustomError(response.name, response.message, response.status);
-    }
+        //----> Insert new post into db.
+        const response = await postModel.createPost(req);
 
-    //----> Send back response.
-    revalidatePath("/");
+        return {
+            post: response,
+            error: null
+        }
+    }catch(error) {
+        return {
+            post: null,
+            error
+        }
+    }
 
 }
 
 export async function deletePostById(id:string){
     //----> Delete the post with the given id.
-    const response = await postModel.deletePostById(id);
+    try {
+        const response = await postModel.deletePostById(id);
 
-    if (response instanceof CustomError) {
-        throw new CustomError(response.name, response.message, response.status);
+        return {
+            post: response,
+            error: null
+        }
+    }catch(error) {
+        return {
+            post: null,
+            error
+        }
     }
-
-    //----> Send back response.
-    revalidatePath("/");
-    redirect("/posts")
 }
 
 export async function deletePostsByAuthorId(authorId:string){
-    //----> Delete all the posts with the given authorId.
-    const response = await postModel.deletePostByAuthorId(authorId);
+    try {
+        //----> Delete all the posts with the given authorId.
+        const response = await postModel.deletePostByAuthorId(authorId);
 
-    if (response instanceof CustomError) {
-        throw new CustomError(response.name, response.message, response.status);
+        return {
+            message: response,
+            error: null
+        }
+    }catch(error) {
+        return {
+            message: null,
+            error
+        }
     }
-
-    //----> Send back response.
-    return response;
 
 }
 
@@ -66,54 +75,74 @@ export async function editPostById(formData:FormData){
 
     console.log("In edit post, req : ", req);
 
-    //----> Check validation error.
-    const result = validateWithZodSchema(postSchema, req)
-    if (result instanceof CustomError) {
-        throw new CustomError(result.name, result.message, result.status);
+    try {
+        //----> Check validation error.
+        validateWithZodSchema(postSchema, req)
+
+        //----> Edit the post with the given id.
+        const response = await postModel.editPostById(id, req);
+
+        return {
+            message: response,
+            error: null
+        }
+    }catch(error) {
+        return {
+            message: null,
+            error
+        }
     }
-    //----> Edit the post with the given id.
-    const response = await postModel.editPostById(id, req);
-
-    if (response instanceof CustomError) {
-        throw new CustomError(response.name, response.message, response.status);
-    }
-
-    //----> Send back response.
-    revalidatePath("/")
-
 }
 
 export async function getPostById(id:string){
-    //----> Fetch the post with the given id.
-    const response = await postModel.getPostById(id);
+    try {
+        //----> Fetch the post with the given id.
+        const response = await postModel.getPostById(id);
 
-    if (response instanceof CustomError) {
-        throw new CustomError(response.name, response.message, response.status);
+        return {
+            post: response,
+            error: null
+        }
+    }catch(error) {
+        return {
+            post: null,
+            error
+        }
     }
-
-    //----> Send back response.
-    return response;
 
 }
 
 export async function getAllPosts(){
-    //----> Fetch all posts.
-    const response = await postModel.getAllPosts();
+    try {
+        //----> Fetch all posts.
+        const response = await postModel.getAllPosts();
 
-    //----> Send back response.
-    return response;
+        return {
+            posts: response,
+            error: null
+        }
+    }catch(error) {
+        return {
+            posts: null,
+            error
+        }
+    }
 }
 
 export async function getPostsByAuthorId(authorId:string){
-    //----> Fetch all the posts with the given authorId.
-    const response = await postModel.getPostsByAuthorId(authorId);
+    try {
+        //----> Fetch all the posts with the given authorId.
+        const response = await postModel.getPostsByAuthorId(authorId);
 
-    //----> Check for error.
-    if (response instanceof CustomError) {
-        throw new CustomError(response.name, response.message, response.status);
+        return {
+            posts: response,
+            error: null
+        }
+    }catch(error) {
+        return {
+            posts: null,
+            error
+        }
     }
-
-    //----> Send back response.
-    return response;
 }
 

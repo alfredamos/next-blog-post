@@ -1,15 +1,21 @@
 import {changeUserPassword} from "@/app/actions/auth.action";
 import CancelButton from "@/utils/CancelButton";
 import Form from "next/form";
+import {redirect} from "next/navigation";
 
 type email = {
     email: string;
 }
 
 export default async function ChangePasswordForm({ email }: email) {
-        return (
+   const changeUserPasswordAction = async (formData: FormData) => {
+       await changeUserPassword(formData);
+       redirect("/")
+   }
+
+    return (
             <Form
-                action={changeUserPassword}
+                action={changeUserPasswordAction}
                 className="bg-white text-slate-800 max-w-lg flex flex-col justify-center items-center mx-auto rounded-xl shadow-2xl py-10 mt-10"
             >
                 <h4 className="font-bold text-slate-800 text-2xl mb-6">

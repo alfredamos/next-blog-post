@@ -13,16 +13,19 @@ export async function ownerCheckOrAdmin(userIdOnResource: string) {
     //----> Check for admin privilege.
     const isAdmin = role === Role.Admin;
 
+    console.log("ownerCheckOrAdmin, isSameUser: ", isSameId);
+    console.log("ownerCheckOrAdmin, isAdmin: ", isAdmin);
+
     //----> Not same id and not admin.
     if (!isSameId && !isAdmin) {
         return false;
     }
-    console.log("ownerCheckOrAdmin", userId, isAdmin);
+
     //----> Is either admin or owner.
     return true;
 
 }
 
 function checkSameId(userIdOne: string, userIdTwo: string) {
-    return userIdOne.normalize() === userIdTwo.normalize();
+    return userIdOne?.normalize() === userIdTwo?.normalize();
 }

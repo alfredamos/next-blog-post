@@ -26,6 +26,7 @@ export default function DeleteUser({user, id}: Prop) {
         await deleteUserById(id);
         handleCloseModal();
 
+        router.refresh();
         router.push("/");
     }
 

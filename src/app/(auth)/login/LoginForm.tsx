@@ -7,6 +7,7 @@ import {useAuthContext} from "@/hooks/useAuthContext";
 import CancelButton from "@/utils/CancelButton";
 import {useLocalStorage} from "@/hooks/useLocalStorage";
 import {LocalStorageParam} from "@/utils/LocalStorageParam";
+import {User} from "@prisma/client";
 
 export default function LoginForm() {
     const router = useRouter();
@@ -15,7 +16,9 @@ export default function LoginForm() {
 
     const loginSubmitHandler = async (formData: FormData) => {
         try {
-            const response = await loginAction(formData); //----> Login.
+            const {user: currentUser,} = await loginAction(formData); //----> Login.
+
+            const response = currentUser as Session;
 
             //----> Set both the auth-context and local-storage.
             setUserResponse(response);

@@ -45,7 +45,7 @@ class UserModel {
    async getAllUsers(query?: string) {
        //----> Must be an admin.
        if (!await adminUserUtil()){
-           return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+           throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
        }
 
        //----> Get users marching the giving query.

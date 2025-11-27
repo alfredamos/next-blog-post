@@ -7,14 +7,14 @@ export async function DELETE(_request: Request, {params}: {params: Promise<{auth
     //----> Get the authorId from params.
     const {authorId} = await params;
 
-    //----> Delete all the posts associated with this authorId.
-    const response = await postModel.deletePostByAuthorId(authorId);
+    try {
+        //----> Delete all the posts associated with this authorId.
+        const response = await postModel.deletePostByAuthorId(authorId);
 
-    //----> Check for error.
-    if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.NOT_FOUND});
+        //----> Send back response.
+        return NextResponse.json(response);
+    }catch(err){
+        const error = err as CustomError;
+        return NextResponse.json(error, {status: error?.status });
     }
-
-    //----> Send back response.
-    return NextResponse.json(response);
 }

@@ -9,20 +9,17 @@ export async function POST(request: NextRequest) {
     //----> Get the loginUser payload from request.
     const loginUser = await request.json() as LoginUser;
 
-    //----> Check validation error.
-    const result = validateWithZodSchema(loginUserSchema, loginUser)
-    if (result instanceof CustomError) {
-        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
+    try {
+        //----> Check validation error.
+        const result = validateWithZodSchema(loginUserSchema, loginUser)
+
+        //----> LoginUser in the db.
+        const response = await authModel.loginUser(result.data);
+
+        //----> Send back response.
+        return NextResponse.json(response, {status: StatusCodes.OK});
+    }catch (err){
+        const error = err as CustomError;
+        return NextResponse.json(error, {status: error?.status });
     }
-
-    //----> LoginUser in the db.
-    const response  = await authModel.loginUser(result.data);
-
-    //----> Check for error.
-    if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.INTERNAL_SERVER_ERROR});
-    }
-
-    //----> Send back response.
-    return NextResponse.json(response, {status: StatusCodes.OK});
 }

@@ -7,11 +7,6 @@ import {CustomError} from "@/utils/customError.util";
 import {Role} from "@prisma/client";
 
 export function validateUserToken(token: string): Session{
-    //----> Check for empty token.
-    if(!token) {
-        return USER_NOT_LOGIN;
-    }
-
     //----> Verify the jwt-token
     try {
         const tokenJwt = jwt?.verify(token, process.env.JWT_TOKEN_KEY!) as TokenJwt;

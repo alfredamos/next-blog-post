@@ -10,19 +10,16 @@ export async function PATCH(request: NextRequest) {
     const changeUserPassword = await request.json() as ChangeUserPassword;
 
     //----> Check validation error.
-    const result = validateWithZodSchema(changeUserPasswordSchema, changeUserPassword)
-    if (result instanceof CustomError) {
-        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
+    try {
+        const result = validateWithZodSchema(changeUserPasswordSchema, changeUserPassword)
+
+        //----> Change password in the db.
+        const response = await authModel.changeUserPassword(result.data);
+
+        //----> Send back response.
+        return NextResponse.json(response, {status: StatusCodes.OK});
+    }catch(err) {
+        const error = err as CustomError;
+        return NextResponse.json(error, {status: error?.status });
     }
-
-    //----> Change password in the db.
-    const response  = await authModel.changeUserPassword(result.data);
-
-    //----> Check for error.
-    if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
-    }
-
-    //----> Send back response.
-    return NextResponse.json(response, {status: StatusCodes.OK});
 }

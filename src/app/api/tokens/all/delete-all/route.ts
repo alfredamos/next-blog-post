@@ -4,14 +4,14 @@ import {tokenModel} from "@/models/token.model";
 import {CustomError} from "@/utils/customError.util";
 
 export async function DELETE() {
-    //----> Delete all invalid tokens associated with the given id.
-    const result  = await tokenModel.deleteAllInvalidTokens();
+    try {
+        //----> Delete all invalid tokens associated with the given id.
+        const result = await tokenModel.deleteAllInvalidTokens();
 
-    //----> Check for error.
-    if (result instanceof CustomError) {
-        return NextResponse.json(result);
+        //----> Send back response.
+        return NextResponse.json(result, {status: StatusCodes.OK});
+    }catch(err) {
+        const error = err as CustomError;
+        return NextResponse.json(error, {status: error?.status });
     }
-
-    //----> Send back response.
-    return NextResponse.json(result, {status: StatusCodes.OK});
 }

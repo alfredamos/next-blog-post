@@ -6,18 +6,18 @@ import {authModel} from "@/models/auth.model";
 import {CustomError} from "@/utils/customError.util";
 
 export async function POST() {
-    //----> Get the refresh token.
-    const cookieStore = await cookies();
-    const refreshToken = cookieStore.get(CookieParam.refreshTokenName)?.value as string;
+    try {
+        //----> Get the refresh token.
+        const cookieStore = await cookies();
+        const refreshToken = cookieStore.get(CookieParam.refreshTokenName)?.value as string;
 
-    //----> RefreshUser in the db.
-    const response  = await authModel.refreshUserToken(refreshToken);
+        //----> RefreshUser in the db.
+        const response = await authModel.refreshUserToken(refreshToken);
 
-    //----> Check for error.
-    if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
+        //----> Send back response.
+        return NextResponse.json(response, {status: StatusCodes.OK});
+    }catch(err){
+        const error = err as CustomError;
+        return NextResponse.json(error, {status: error?.status });
     }
-
-    //----> Send back response.
-    return NextResponse.json(response, {status: StatusCodes.OK});
 }

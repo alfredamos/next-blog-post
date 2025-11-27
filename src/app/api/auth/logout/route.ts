@@ -4,14 +4,19 @@ import {authModel} from "@/models/auth.model";
 import {CustomError} from "@/utils/customError.util";
 
 export async function POST() {
-    //----> LogoutUser in the db.
-    const response  = await authModel.logoutUser();
+    try {
+        //----> LogoutUser in the db.
+        const response = await authModel.logoutUser();
 
-    //----> Check for error.
-    if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
+        //----> Check for error.
+        if (response instanceof CustomError) {
+            return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
+        }
+
+        //----> Send back response.
+        return NextResponse.json(response, {status: StatusCodes.OK});
+    }catch (err){
+        const error = err as CustomError;
+        return NextResponse.json(error, {status: error?.status });
     }
-
-    //----> Send back response.
-    return NextResponse.json(response, {status: StatusCodes.OK});
 }

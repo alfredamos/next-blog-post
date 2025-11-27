@@ -55,6 +55,11 @@ class TokenModel{
         //----> Fetch the token object with the given access-token.
         const token = await this.getOneToken(accessToken);
 
+        //----> Check for error.
+        if (!token){
+            throw new CustomError("Not found", "Token not found in db!", StatusCodes.FORBIDDEN)
+        }
+
         //----> Send back response.
         return token;
     }

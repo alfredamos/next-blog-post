@@ -9,19 +9,17 @@ export async function PATCH(request: NextRequest) {
     //----> Get the edit-user-profile payload from request.
     const editUserProfile = await request.json() as EditUserProfile;
 
-    //----> Check validation error.
-    const result = validateWithZodSchema(editProfileUserSchema, editUserProfile)
-    if (result instanceof CustomError) {
-        return NextResponse.json(result, {status: StatusCodes.BAD_REQUEST});
-    }
+    try {
+        //----> Check validation error.
+        const result = validateWithZodSchema(editProfileUserSchema, editUserProfile)
 
-    //----> Edit Profile user in the db.
-    const response  = await authModel.editUserProfile(result.data);
-    //----> Check for error.
-    if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.UNAUTHORIZED});
-    }
+        //----> Edit Profile user in the db.
+        const response = await authModel.editUserProfile(result.data);
 
-    //----> Send back response.
-    return NextResponse.json(response, {status: StatusCodes.OK});
+        //----> Send back response.
+        return NextResponse.json(response, {status: StatusCodes.OK});
+    }catch(err) {
+        const error = err as CustomError;
+        return NextResponse.json(error, {status: error?.status });
+    }
 }

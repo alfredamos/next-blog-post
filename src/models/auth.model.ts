@@ -115,8 +115,17 @@ class AuthModel{
     }
 
     refreshUserToken = async (refreshToken: string) => {
+        if (!refreshToken) {
+            throw new CustomError("Not found", "No refresh-token available!", StatusCodes.NOT_FOUND);
+        }
+
+        console.log("In refresh-user-token, refreshToken: ", refreshToken);
         //----> Validate refresh token.
         const userToken = validateUserToken(refreshToken as string);
+
+        if (!userToken) {
+            throw new CustomError("Unauthorized", "Invalid credentials!", StatusCodes.UNAUTHORIZED);
+        }
 
         //----> Generate access and refresh tokens and store them in cookies and send back access token.
         return await this.generateAccessAndRefreshTokensByUser(userToken as TokenJwt);

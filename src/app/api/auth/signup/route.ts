@@ -8,24 +8,18 @@ import {CustomError} from "@/utils/customError.util";
 export async function POST(request: NextRequest) {
     //----> Get the signupUser payload from request.
     const signupUser = await request.json() as SignupUser;
-    console.log("In signupUser", signupUser);
-    //----> Check validation error.
-    const result = validateWithZodSchema(signupUserSchema, signupUser)
 
-    if (result instanceof CustomError) {
-        return NextResponse.json(result);
+    try {
+        //----> Check validation error.
+        const result = validateWithZodSchema(signupUserSchema, signupUser)
+
+        //----> SignupUser in the db.
+        const response = await authModel.signupUser(result.data);
+
+        //----> Send back response.
+        return NextResponse.json(response, {status: StatusCodes.OK});
+    }catch (err) {
+        const error = err as CustomError;
+        return NextResponse.json(error, {status: error?.status });
     }
-
-    console.log("In signupUser", result.data);
-
-    //----> SignupUser in the db.
-    const response  = await authModel.signupUser(result.data);
-
-    //----> Check for error.
-    if (response instanceof CustomError) {
-        return NextResponse.json(response, {status: StatusCodes.BAD_REQUEST});
-    }
-
-    //----> Send back response.
-    return NextResponse.json(response, {status: StatusCodes.OK});
 }

@@ -9,14 +9,11 @@ import {adminUserUtil} from "@/utils/adminUser.util";
 class UserModel {
    async deleteUserById(id: string) {
        //----> Fetch the user.
-       const user = await this.getOneUser(id);
-       if (!user) {
-           return new CustomError("Not found", "User is not foud in db!", StatusCodes.NOT_FOUND);
-       }
+       await this.getOneUser(id);
 
        //----> Check for ownership or admin.
        if (!await ownerCheckOrAdmin(id)){
-           return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+           throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
        }
 
        //----> Delete the user with the given id.
@@ -30,19 +27,17 @@ class UserModel {
    async getUserById(id: string) {
        //----> Check for ownership or admin.
        if (!await ownerCheckOrAdmin(id)){
-           return new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
+           throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
        }
 
        //----> Fetch the user.
        const user = await this.getOneUser(id);
-       if (!user) {
-           return new CustomError("Not found", "Author is not foud in db!", StatusCodes.NOT_FOUND);
-       }
        return  toUserDto(user);
 
    }
 
    async getAllUsers(query?: string) {
+       console.log("In get-all-users, query : ", query);
        //----> Must be an admin.
        if (!await adminUserUtil()){
            throw new CustomError("Forbidden", "You don't have permission to view or perform any action on this page!", StatusCodes.FORBIDDEN)
@@ -64,7 +59,14 @@ class UserModel {
 
    private async getOneUser(id: string) {
        //----> Fetch the user from db.
-       return prisma.user.findUnique({ where: { id } });
+       const user = await prisma.user.findUnique({ where: { id } });
+
+       //----> Check for error.
+       if (!user) {
+           throw new CustomError("Not found", "User is not foud in db!", StatusCodes.NOT_FOUND);
+       }
+
+       return user;
    }
 }
 

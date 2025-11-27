@@ -6,13 +6,14 @@ import {CustomError} from "@/utils/customError.util";
 export async function DELETE(_request: NextRequest,  { params }: { params: Promise<{ userId: string }> } ) {
     //----> Delete all tokens associated with the given id.
     const {userId} = await params;
-    const result  = await tokenModel.deleteInvalidTokensByUserId(userId);
 
-    //----> Check for error.
-    if (result instanceof CustomError) {
-        return NextResponse.json(result);
+    try {
+        const result = await tokenModel.deleteInvalidTokensByUserId(userId);
+
+        //----> Send back response.
+        return NextResponse.json(result, {status: StatusCodes.OK});
+    }catch(err){
+        const error = err as CustomError;
+        return NextResponse.json(error, {status: error?.status });
     }
-
-    //----> Send back response.
-    return NextResponse.json(result, {status: StatusCodes.OK});
 }

@@ -7,30 +7,30 @@ export async function GET(_req:Request, {params}:{params:Promise<{userId: string
     //----> Get the user id from params.
     const {userId} = await params;
 
-    //----> Fetch the user with the given userId from db.
-    const user = await userModel.getUserById(userId);
+    try {
+        //----> Fetch the user with the given userId from db.
+        const user = await userModel.getUserById(userId);
 
-    //----> Check for error.
-    if (user instanceof CustomError) {
-        return NextResponse.json(user);
+        //----> Send back response.
+        return NextResponse.json(user, {status: StatusCodes.OK});
+    }catch(err){
+        const error = err as CustomError;
+        return NextResponse.json(error, {status: error?.status });
     }
-
-    //----> Send back response.
-    return NextResponse.json(user, {status: StatusCodes.OK});
 }
 
 export async function DELETE(_req:Request, {params}:{params:Promise<{userId: string}>}) {
     //----> Get the user id from params.
     const {userId} = await params;
 
-    //----> Delete the user with the given userId from db.
-    const user = await userModel.deleteUserById(userId);
+    try {
+        //----> Delete the user with the given userId from db.
+        const user = await userModel.deleteUserById(userId);
 
-    //----> Check for error.
-    if (user instanceof CustomError) {
-        return NextResponse.json(user);
+        //----> Send back response.
+        return NextResponse.json(user, {status: StatusCodes.OK});
+    }catch(err){
+        const error = err as CustomError;
+        return NextResponse.json(error, {status: error?.status });
     }
-
-    //----> Send back response.
-    return NextResponse.json(user, {status: StatusCodes.OK});
 }
